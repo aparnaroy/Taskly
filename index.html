@@ -4,42 +4,25 @@
 <head>
     <title>Taskly</title>
     <link rel="icon" href="./img/favicon.ico" type="image/x-icon"/>
-    <link href="./css/main-page.css" rel="stylesheet" type="text/css" />
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
-        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous">
-    </script>
-    <script src="./js/main.js"></script>
+    <link href="./css/start-up.css" rel="stylesheet" type="text/css" />
 </head>
 
 <body>
     <div class="container">
-        <img src="./img/sidebar-icon-black.png" class="menu-icon" id="sidebarIcon" onclick="toggleNav()">
-        <img src="./img/lightdark-icon-black.png" class="mode-icon" id="lightdarkIcon" onclick="toggleLightDarkMode()">
-        <img src="./img/logo.png" alt="Taskly" class="logo"/>
-
-        <!-- Side Nav Bar -->
-        <div id="side-nav" class="side-nav">
-            <h2>My Lists</h2>
-            <a href="#">List 1</a>
-            <a href="#">List 2</a>
-            <a href="#">List 3</a>
-            <h2>Tags</h2>
-            <a href="#">Work</a>
-            <a href="#">Personal</a>
-            <a href="#">Urgent</a>
+        <div class="load-in-container">
+            <img src="./img/white-taskly.png" alt="Taskly" class="title">
+            <div class="line"></div>
+            <p class="subtitle">Write it. Do it. Done.</p>
         </div>
 
-        <div class="main-content">
-            <h1 id="list-title">List 1</h1>
-            <div class="box">
-                <ul>
-                    <li>Item 1</li>
-                    <li>Item 2</li>
-                    <li>Item 3</li>
-                    <li>Item 4</li>
-                </ul>
-            </div>
-        </div>
+        <div class="logo-container"></div>
     </div>
+
+    <script>
+        // Show main page after animations are done
+        setTimeout(() => {
+            window.location.href = "./main-page.html";
+        }, 7200);
+    </script>
 </body>
 </html>

@@ -1,0 +1,52 @@
+/******************* Dark Mode ********************/
+
+body.dark-mode {
+    background-color: #111; /* Dark background */
+}
+
+body.dark-mode .side-nav {
+    background-color: #eee; /* White sidebar */
+}
+
+body.dark-mode .side-nav h2 {
+    color: rgb(0, 0, 0); /* Black text for sidebar titles */
+}
+
+body.dark-mode .side-nav a {
+    color: rgb(59, 59, 59); /* Black text for sidebar links */
+}
+
+body.dark-mode .side-nav a:hover {
+    color: #000000; /* Darker on hover */
+}
+
+body.dark-mode #list-title {
+    color: white;
+}
+
+body.dark-mode .box {
+    background-color: #111;
+}
+
+body.dark-mode #taskList li {
+    color: white;
+    border-bottom: 1px solid #ccc;
+}
+
+body.dark-mode #newTaskInput {
+    background: #181818;
+    border: 1.5px solid #686868;
+    color: #eee
+}
+
+body.dark-mode #taskList li:last-child {
+    border-bottom: none; /* Remove the bottom border from the last list item */
+}
+
+body.dark-mode .circle::before {
+    background: #111;
+}
+
+body.dark-mode .circle.clicked::before {
+    background: transparent; /* Remove the inner circle fill on click */
+}
