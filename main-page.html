@@ -33,11 +33,26 @@
                 <a href="#">List 3</a>
             </div>
             <div id="tags">
-                <h2>Tags</h2>
-                <a href="#">Work</a>
-                <a href="#">Personal</a>
-                <a href="#">School</a>
-                <a href="#">Urgent</a>
+                <h2>
+                    Tags
+                    <img src="./img/add.png" class="add-tag" onclick="addNewTag()" alt="Add"/>
+                </h2>
+                <div class="tag-item">
+                    <a href="#" class="tag-name">Work</a>
+                    <input type="color" class="color-picker" value="#0279c9">
+                </div>
+                <div class="tag-item">
+                    <a href="#" class="tag-name">Personal</a>
+                    <input type="color" class="color-picker" value="#910ea1">
+                </div>
+                <div class="tag-item">
+                    <a href="#" class="tag-name">School</a>
+                    <input type="color" class="color-picker" value="#11a2bf">
+                </div>
+                <div class="tag-item">
+                    <a href="#" class="tag-name">Urgent</a>
+                    <input type="color" class="color-picker" value="#bf1111">
+                </div>
             </div>
         </div>
 
@@ -48,21 +63,29 @@
                     <li>
                         <div class="circle" onclick="taskCompleted(event)"></div>
                         <input type="text" class="task-input task-text" value="Task 1" onchange="updateTask(event)" />
+                        <img src="./img/tag.png" class="tag-button" onclick="toggleTagDropdown(event)" />
+                        <div class="tag-dropdown"></div>
                         <img src="./img/delete.png" class="delete-button" onclick="deleteTask(event)" alt="Delete"/>
                     </li>
                     <li>
                         <div class="circle" onclick="taskCompleted(event)"></div>
                         <input type="text" class="task-input task-text" value="Task 2" onchange="updateTask(event)" />
+                        <img src="./img/tag.png" class="tag-button" onclick="toggleTagDropdown(event)" />
+                        <div class="tag-dropdown"></div>
                         <img src="./img/delete.png" class="delete-button" onclick="deleteTask(event)" alt="Delete"/>
                     </li>
                     <li>
                         <div class="circle" onclick="taskCompleted(event)"></div>
                         <input type="text" class="task-input task-text" value="Task 3" onchange="updateTask(event)" />
+                        <img src="./img/tag.png" class="tag-button" onclick="toggleTagDropdown(event)" />
+                        <div class="tag-dropdown"></div>
                         <img src="./img/delete.png" class="delete-button" onclick="deleteTask(event)" alt="Delete"/>
                     </li>
                     <li>
                         <div class="circle" onclick="taskCompleted(event)"></div>
                         <input type="text" class="task-input task-text" value="Task 4" onchange="updateTask(event)" />
+                        <img src="./img/tag.png" class="tag-button" onclick="toggleTagDropdown(event)" />
+                        <div class="tag-dropdown"></div>
                         <img src="./img/delete.png" class="delete-button" onclick="deleteTask(event)" alt="Delete"/>
                     </li>
                 </ul>

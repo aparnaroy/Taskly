@@ -77,6 +77,10 @@ body.dark-mode .delete-button {
     filter: invert(1);
 }
 
+body.dark-mode .tag-button {
+    filter: invert(1);
+}
+
 body.dark-mode .add-list {
     filter: invert(0);
 }
