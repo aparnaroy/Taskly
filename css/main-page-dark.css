@@ -4,6 +4,11 @@ body.dark-mode {
     background-color: #111; /* Dark background */
 }
 
+body.dark-mode .top-nav.scrolled {
+    background-color: #111; /* Black background on scroll */
+    box-shadow: 0 2px 5px rgba(255, 255, 255, 0.05); /* Shadow for depth */
+}
+
 body.dark-mode .side-nav {
     background-color: #eee; /* White sidebar */
 }

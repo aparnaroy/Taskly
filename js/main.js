@@ -1,3 +1,13 @@
+window.onscroll = function() {
+    const navbar = document.querySelector('.top-nav');
+    if (document.body.scrollTop > 50 || document.documentElement.scrollTop > 50) {
+        navbar.classList.add('scrolled'); // Add the scrolled class
+    } else {
+        navbar.classList.remove('scrolled'); // Remove the scrolled class
+    }
+};
+
+
 function toggleNav() {
     const sidebarIcon = document.getElementById('sidebarIcon');
     const mainContent = document.querySelector('.main-content');

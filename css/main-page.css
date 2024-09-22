@@ -20,9 +20,31 @@ body {
     height: 100%;
 }
 
-/* Logo */
+/* Top Navbar */
+.top-nav {
+    position: fixed; /* Fixed position to stay at the top */
+    top: 0; /* Align to the top of the viewport */
+    left: 0; /* Align to the left */
+    right: 0; /* Extend to the right */
+    height: 80px; /* Adjust height as needed */
+    background-color: transparent; /* Start with a transparent background */
+    box-shadow: none; /* No shadow initially */
+    z-index: 1; /* Ensure it appears above other elements */
+    display: flex; /* Flexbox for layout */
+    align-items: center; /* Center items vertically */
+    padding: 0px 20px; /* Horizontal padding */
+    transition: background-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
+}
+
+/* When scrolled down */
+.top-nav.scrolled {
+    background-color: white; /* White background on scroll */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Shadow for depth */
+}
+
+/* Adjust the logo inside the navbar */
 .logo {
-    position: absolute;
+    position: fixed;
     top: 15px;
     left: 70px;
     width: 150px;
@@ -34,7 +56,7 @@ body {
 
 /* Sidebar Icon */
 .menu-icon {
-    position: absolute;
+    position: fixed;
     top: 28px;
     left: 15px;
     width: 28px;
@@ -42,8 +64,18 @@ body {
     background-size: contain;
     background-repeat: no-repeat;
     cursor: pointer;
-    z-index: 2;
+    z-index: 30;
     transition: filter 0.3s; /* Smooth transition for color change */
+}
+
+.mode-icon {
+    position: absolute;
+    top: 18px;
+    right: 45px;
+    width: 38px;
+    height: auto;
+    cursor: pointer;
+    z-index: 2;
 }
   
 /* Side Navigation Bar */
@@ -57,6 +89,7 @@ body {
     overflow-y: auto; /* Enable vertical scrolling if needed */
     transition: transform 0.5s ease; /* Smooth transition for the sidebar */
     padding-top: 70px; /* Start a little below the top */
+    z-index: 2;
 }
 
 .side-nav.open {
@@ -83,16 +116,6 @@ body {
 
 .side-nav a:hover {
     color: #f1f1f1;
-}
-
-.mode-icon {
-    position: absolute;
-    top: 18px;
-    right: 45px;
-    width: 38px;
-    height: auto;
-    cursor: pointer;
-    z-index: 2;
 }
 
 
@@ -138,6 +161,7 @@ body {
     padding-bottom: 15px;
     padding-left: 70px;
     padding-right: 70px;
+    margin-bottom: 50px;
     background-color: white;
     border-radius: 30px;
     box-shadow: 30px 40px 30px rgba(0, 0, 0, 0.2);
