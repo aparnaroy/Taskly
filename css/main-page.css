@@ -308,20 +308,20 @@ body {
     transition: color 0.3s ease;
 }
 
-.task-text::before {
+/* .task-text::before {
     content: '';
     position: absolute;
     bottom: 50%;
     left: 0;
     width: 0;
     height: 1.5px;
-    background-color: #a3a1a1; /* Strike-through color */
+    background-color: #a3a1a1;   Strike through color
     transition: width 0.5s ease;
 }
 
 .completed .task-text::before {
     width: 100%;
-}
+} */
 
 .delete-button {
     padding: 6px;
@@ -471,7 +471,7 @@ body {
     margin-left: 10px; /* Space between circle and input */
     margin-right: 20px;
     outline: none; /* No outline on focus */
-    width: 10px;
+    width: 0px;
 }
 
 .task-input:focus {
@@ -523,6 +523,7 @@ body {
     background-color: #DAF7A6;
 }
 
-
-
-
+/* Make tags for task look dull when task done */
+.dull {
+    opacity: 0.4; 
+}

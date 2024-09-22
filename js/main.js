@@ -105,9 +105,16 @@ function updateNavbarListTitle() {
 
 function taskCompleted(event) {
     const listItem = event.currentTarget.closest('li');
-    listItem.classList.toggle('completed'); // Toggles the completed class on both the circle and text/input
+    listItem.classList.toggle('completed'); // Toggle the completed class
 
-    const taskInput = listItem.querySelector('.task-input');
+    const taskInput = listItem.querySelector('.task-text');
+    const tagElements = listItem.querySelectorAll('.tag-rectangle'); // Get all tag elements
+
+    // Apply or remove the dull class based on completion status
+    tagElements.forEach(tag => {
+        tag.classList.toggle('dull', listItem.classList.contains('completed'));
+    });
+
     if (taskInput) {
         taskInput.classList.toggle('completed'); // Toggle the completed class for the input
     }
@@ -117,6 +124,7 @@ function taskCompleted(event) {
         createConfetti();
     }
 }
+
 
 function createConfetti() {
     const numConfetti = 300; // Number of confetti pieces
@@ -306,5 +314,7 @@ function getRandomColor() {
     }
     return color;
 }
+
+
 
 
