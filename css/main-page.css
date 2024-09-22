@@ -2,12 +2,11 @@
 
 body {
     margin: 0;
-    height: 100vh;
+    height: auto;
     display: flex;
     justify-content: flex-start;
     align-items: flex-start;
     background: white;
-    overflow: hidden;
     font-family: 'Roboto', sans-serif;
 }
 
@@ -116,11 +115,19 @@ body {
 /* Center the title by default */
 #list-title {
     font-size: 36px;
+    font-weight: bold;
     color: #333;
+    margin-top: 20px;
     margin-bottom: 30px;
     text-align: center; /* Center the text */
     width: 63vw; /* Match the width of the box */
+    border: none; /* No border */
+    outline: none; /* No outline on focus */
     transition: text-align 0.5s ease, margin-left 0.5s ease; /* Smooth transition */
+}
+
+#list-title:focus {
+    border-bottom: 1px solid #111; /* Optional: underline on focus */
 }
 
 /* Center the box by default */
@@ -151,7 +158,7 @@ body {
 }
 
 /* Left-align title when the sidebar is open */
-.main-content.left-align #list-title {
+.main-content.left-align #list-title  {
     text-align: left; /* Left-align the text */
     margin-left: calc(250px + 65px); /* Align title with the box */
 }
@@ -207,9 +214,15 @@ body {
 #taskList li {
     display: flex;
     align-items: center; /* Center circle and text vertically */
-    padding: 22px 0; /* Vertical padding for each item */
+    padding: 21px 10px; /* Vertical padding for each item */
     border-bottom: 1px solid #ccc; /* Thin horizontal line */
     font-size: 18px;
+    position: relative; /* For positioning if needed */
+    transition: background-color 0.3s ease; /* Smooth background color transition */
+}
+
+#taskList li:hover {
+    background-color: rgb(237, 237, 237);
 }
 
 #taskList li:last-child {
@@ -224,7 +237,7 @@ body {
     margin-right: 18px; /* Space between circle and text */
     cursor: pointer;
     position: relative;
-    background: linear-gradient(to right, #0279c9, #8e02ac); /* Gradient fill */
+    background: linear-gradient(to bottom right, #0279c9, #8e02ac); /* Gradient fill */
     transition: filter 0.3s ease;
 }
 
@@ -245,7 +258,134 @@ body {
     filter: brightness(1.3); /* Lighter shade on hover */
 }
 
-.circle.clicked::before {
-    background: transparent; /* Remove the inner circle fill on click */
+/* Completed state for circle and list item */
+.completed .circle::before {
+    background: transparent; /* Remove the inner circle fill */
 }
+
+/* Completed list item text */
+.completed {
+    color: #a3a1a1; /* Gray out the text */
+    position: relative;
+    padding-left: 30px; /* Space for the circle */
+    transition: color 0.3s ease; /* Smooth color transition */
+}
+
+/* Strike-through effect, only under the text */
+.completed .task-text {
+    position: relative;
+    color: #a3a1a1;     /* Gray out the text */
+}
+
+.task-text {
+    position: relative;
+    padding-left: 0px;
+    transition: color 0.3s ease;
+}
+
+.task-text::before {
+    content: '';
+    position: absolute;
+    bottom: 50%;
+    left: 0;
+    width: 0;
+    height: 1.5px;
+    background-color: #a3a1a1; /* Strike-through color */
+    transition: width 0.5s ease;
+}
+
+.completed .task-text::before {
+    width: 100%;
+}
+
+.delete-button {
+    padding: 6px;
+    margin-left: auto; /* Push the delete button to the right */
+    width: 15px; /* Adjust size as needed */
+    height: auto;
+    cursor: pointer;
+    transition: all 0.3s ease; /* Smooth transition for hover effect */
+}
+
+.delete-button:hover {
+    border-radius: 50%;
+    background-color: rgba(255, 0, 0, 0.865);
+}
+
+.add-list {
+    width: 16px; /* Adjust size as needed */
+    height: auto;
+    cursor: pointer;
+    margin-left: 80px; /* Push it to the right */
+    display: inline-block; /* Ensure it behaves like a block for proper spacing */
+    filter: invert(1);
+    transition: all 0.25s ease; /* Smooth transition for hover effect */
+}
+
+.add-list:hover {
+    scale: 1.3; /* Slightly darker on hover */
+    transform: rotate(180deg);
+}
+
+.task-input {
+    border: none; /* No border */
+    background: transparent; /* Transparent background */
+    font-size: 18px; /* Match font size */
+    flex-grow: 1; /* Take available space */
+    margin-left: 10px; /* Space between circle and input */
+    margin-right: 20px;
+    outline: none; /* No outline on focus */
+}
+
+.task-input:focus {
+    border-bottom: 1px solid #0279c9; /* Optional: underline on focus */
+}
+
+/* Strike-through effect for completed input tasks */
+.completed .task-input {
+    text-decoration: line-through; /* Apply the strike-through effect */
+    color: #a3a1a1; /* Gray out the text */
+}
+
+
+@keyframes fall {
+    0% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(110vh); /* End point */
+        opacity: .2;
+    }
+}
+
+.confetti {
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    background-color: #FF5733; /* Change to desired colors */
+    opacity: 1;
+    pointer-events: none;
+    z-index: 9999; /* Ensure it appears above other elements */
+    animation: fall 2s cubic-bezier(.7, 0.1, .5, 1) forwards; /* Smooth acceleration */
+    /* Randomize size, colors, and starting positions */
+    left: calc(50% - 5px); /* Center initially */
+    animation-duration: 2s; /* Adjust duration for a longer fall */
+}
+
+/* Randomize the size */
+.confetti-small {
+    width: 6px;
+    height: 6px;
+    background-color: #FFC300;
+}
+
+.confetti-large {
+    width: 12px;
+    height: 12px;
+    background-color: #DAF7A6;
+}
+
+
+
 

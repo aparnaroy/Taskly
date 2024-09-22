@@ -20,35 +20,47 @@
 
         <!-- Side Nav Bar -->
         <div id="side-nav" class="side-nav">
-            <h2>My Lists</h2>
-            <a href="#">List 1</a>
-            <a href="#">List 2</a>
-            <a href="#">List 3</a>
-            <h2>Tags</h2>
-            <a href="#">Work</a>
-            <a href="#">Personal</a>
-            <a href="#">Urgent</a>
+            <div id="lists">
+                <h2>
+                    My Lists
+                    <img src="./img/add.png" class="add-list" onclick="addNewList()" alt="Add"/>
+                </h2>
+                <a href="#">List 1</a>
+                <a href="#">List 2</a>
+                <a href="#">List 3</a>
+            </div>
+            <div id="tags">
+                <h2>Tags</h2>
+                <a href="#">Work</a>
+                <a href="#">Personal</a>
+                <a href="#">School</a>
+                <a href="#">Urgent</a>
+            </div>
         </div>
 
         <div class="main-content">
-            <h1 id="list-title">List 1</h1>
+            <input type="text" id="list-title" value="List 1" onchange="updateNavbarListTitle()" class="list-title" />
             <div class="box">
                 <ul id="taskList">
                     <li>
-                        <span class="circle" onclick="taskCompleted(event)"></span>
-                        Item 1
+                        <div class="circle" onclick="taskCompleted(event)"></div>
+                        <input type="text" class="task-input task-text" value="Task 1" onchange="updateTask(event)" />
+                        <img src="./img/delete.png" class="delete-button" onclick="deleteTask(event)" alt="Delete"/>
                     </li>
                     <li>
-                        <span class="circle" onclick="taskCompleted(event)"></span>
-                        Item 2
+                        <div class="circle" onclick="taskCompleted(event)"></div>
+                        <input type="text" class="task-input task-text" value="Task 2" onchange="updateTask(event)" />
+                        <img src="./img/delete.png" class="delete-button" onclick="deleteTask(event)" alt="Delete"/>
                     </li>
                     <li>
-                        <span class="circle" onclick="taskCompleted(event)"></span>
-                        Item 3
+                        <div class="circle" onclick="taskCompleted(event)"></div>
+                        <input type="text" class="task-input task-text" value="Task 3" onchange="updateTask(event)" />
+                        <img src="./img/delete.png" class="delete-button" onclick="deleteTask(event)" alt="Delete"/>
                     </li>
                     <li>
-                        <span class="circle" onclick="taskCompleted(event)"></span>
-                        Item 4
+                        <div class="circle" onclick="taskCompleted(event)"></div>
+                        <input type="text" class="task-input task-text" value="Task 4" onchange="updateTask(event)" />
+                        <img src="./img/delete.png" class="delete-button" onclick="deleteTask(event)" alt="Delete"/>
                     </li>
                 </ul>
                 <div class="input-container">

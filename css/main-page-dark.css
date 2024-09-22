@@ -21,7 +21,12 @@ body.dark-mode .side-nav a:hover {
 }
 
 body.dark-mode #list-title {
-    color: white;
+    color: white; /* Text color */
+    background-color: #111; /* Background color */
+}
+
+body.dark-mode #list-title:focus {
+    border-bottom: 1px solid #eee; /* Optional: underline on focus */
 }
 
 body.dark-mode .box {
@@ -33,10 +38,18 @@ body.dark-mode #taskList li {
     border-bottom: 1px solid #ccc;
 }
 
+body.dark-mode .task-input {
+    color: white;
+}
+
 body.dark-mode #newTaskInput {
     background: #181818;
     border: 1.5px solid #686868;
     color: #eee
+}
+
+body.dark-mode #taskList li:hover {
+    background-color: rgb(39, 39, 39);
 }
 
 body.dark-mode #taskList li:last-child {
@@ -47,6 +60,18 @@ body.dark-mode .circle::before {
     background: #111;
 }
 
-body.dark-mode .circle.clicked::before {
-    background: transparent; /* Remove the inner circle fill on click */
+body.dark-mode .completed .circle::before {
+    background: transparent /* Remove the inner circle fill on click */
+}
+
+body.dark-mode .completed {
+    color: #6a6a6a !important;
+}
+
+body.dark-mode .delete-button {
+    filter: invert(1);
+}
+
+body.dark-mode .add-list {
+    filter: invert(0);
 }
