@@ -58,7 +58,7 @@ function addTask() {
 
     const newTask = document.createElement('li');
     newTask.innerHTML = `<div class="circle" onclick="taskCompleted(event)"></div>
-                        <input type="text" class="task-input task-text" value="${input.value}" onchange="updateTask(event)" />
+                        <div class="task-input task-text" contenteditable="true" onchange="updateTask(event)">${input.value}</div>
                         <img src="./img/tag.png" class="tag-button" onclick="toggleTagDropdown(event)" />
                         <div class="tag-dropdown"></div>
                         <img src="./img/delete.png" class="delete-button" onclick="deleteTask(event)" alt="Delete"/>`;
