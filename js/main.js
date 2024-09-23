@@ -136,7 +136,7 @@ function taskCompleted(event) {
 
 
 function createConfetti() {
-    const numConfetti = 2000; // Number of confetti pieces
+    const numConfetti = 1000; // Number of confetti pieces
     const colors = [
         '#FF5733', // Red
         '#FFC300', // Yellow
