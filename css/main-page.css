@@ -189,7 +189,7 @@ body {
 
 /* Left-align the box when the sidebar is open */
 .main-content.left-align .box {
-    margin-left: calc(250px + 65px);; /* Left-align the box with the side nav bar*/
+    margin-left: calc(250px + 65px); /* Left-align the box with the side nav bar */
 }
 
 

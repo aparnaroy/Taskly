@@ -23,7 +23,7 @@ $(function () {
     });
 });
 
-// Show top navbar when scrolling
+// Show top navbar when you scroll down
 window.onscroll = function() {
     const navbar = document.querySelector('.top-nav');
     if (document.body.scrollTop > 50 || document.documentElement.scrollTop > 50) {
@@ -261,7 +261,7 @@ function addTagToTask(event, tagText) {
         }
 
         // Find the tag button element (adjust this selector as necessary)
-        const tagButtonElement = listItem.querySelector('.tag-button'); // Assuming you have a class for the tag button
+        const tagButtonElement = listItem.querySelector('.tag-button');
 
         // Insert the tag element before the tag button element
         listItem.insertBefore(tagElement, tagButtonElement);
@@ -270,7 +270,7 @@ function addTagToTask(event, tagText) {
     // Hide the dropdown after selecting a tag
     const dropdown = listItem.querySelector('.tag-dropdown');
     if (dropdown) {
-        dropdown.classList.remove('visible'); // Assuming you are using 'visible' class to show/hide the dropdown
+        dropdown.classList.remove('visible');
     }
 }
 
