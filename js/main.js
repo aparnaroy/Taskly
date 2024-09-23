@@ -1,5 +1,6 @@
 // Document ready function
 $(function () {
+    // Update tag color as soon as it is changed in the color picker
     document.querySelectorAll('#tags .color-picker').forEach(colorPicker => {
         colorPicker.addEventListener('input', updateTagColor);
     });
@@ -207,7 +208,6 @@ function toggleTagDropdown(event) {
     dropdown.classList.toggle('visible');
 }
 
-
 function addTagToTask(event, tagText) {
     event.preventDefault(); // Prevent the default link behavior
 
@@ -239,6 +239,11 @@ function addTagToTask(event, tagText) {
         tagElement.className = 'tag-rectangle'; // Add a class for styling
         tagElement.style.backgroundColor = color; // Set the color from the color picker
         tagElement.textContent = tagText; // Set the tag text
+
+        // Check if the task is marked as completed and add dull class if needed
+        if (listItem.classList.contains('completed')) {
+            tagElement.classList.add('dull');
+        }
 
         // Find the tag button element (adjust this selector as necessary)
         const tagButtonElement = listItem.querySelector('.tag-button'); // Assuming you have a class for the tag button
