@@ -6,6 +6,21 @@ $(function () {
     });
 
     toggleNav(); // Make sure sidebar is open by default
+
+    // Make it so you can hit Enter to create a new task in addition to clicking the Add button
+    $('#input-container').on( "submit", function(event) {
+        event.preventDefault();
+
+        // Make add button become bright for a sec
+        const addButton = $('#addButton');
+        addButton.css('filter', 'brightness(1.3)');
+        // Revert the filter back to normal after
+        setTimeout(function() {
+            addButton.css('filter', 'brightness(1)');
+        }, 200);
+
+        addTask();
+    });
 });
 
 // Show top navbar when scrolling

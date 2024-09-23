@@ -193,7 +193,7 @@ body {
 }
 
 
-.input-container {
+#input-container {
     position: absolute;
     display: flex;
     align-items: center;
