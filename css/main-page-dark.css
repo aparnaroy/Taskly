@@ -84,3 +84,7 @@ body.dark-mode .tag-button {
 body.dark-mode .add-list {
     filter: invert(0);
 }
+
+body.dark-mode .add-tag {
+    filter: invert(0);
+}

@@ -485,13 +485,13 @@ body {
 }
 
 
-@keyframes fall {
+@keyframes falla {
     0% {
         transform: translateY(0);
         opacity: 1;
     }
     100% {
-        transform: translateY(110vh); /* End point */
+        transform: translateY(120vh); /* End point */
         opacity: .2;
     }
 }
@@ -504,7 +504,7 @@ body {
     opacity: 1;
     pointer-events: none;
     z-index: 9999; /* Ensure it appears above other elements */
-    animation: fall 2s cubic-bezier(.7, 0.1, .5, 1) forwards; /* Smooth acceleration */
+    animation: falla 1s cubic-bezier(.4, 0, .3, 1) forwards; /* Smooth acceleration */
     /* Randomize size, colors, and starting positions */
     left: calc(50% - 5px); /* Center initially */
     animation-duration: 2s; /* Adjust duration for a longer fall */
