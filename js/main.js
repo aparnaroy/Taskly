@@ -1,3 +1,12 @@
+// Document ready function
+$(function () {
+    document.querySelectorAll('#tags .color-picker').forEach(colorPicker => {
+        colorPicker.addEventListener('input', updateTagColor);
+    });
+
+    toggleNav(); // Make sure sidebar is open by default
+});
+
 // Show top navbar when scrolling
 window.onscroll = function() {
     const navbar = document.querySelector('.top-nav');
@@ -244,13 +253,6 @@ function addTagToTask(event, tagText) {
         dropdown.classList.remove('visible'); // Assuming you are using 'visible' class to show/hide the dropdown
     }
 }
-
-
-$(function () {
-    document.querySelectorAll('#tags .color-picker').forEach(colorPicker => {
-        colorPicker.addEventListener('input', updateTagColor);
-    });
-});
 
 function updateTagColor(event) {
     const colorPicker = event.target;
