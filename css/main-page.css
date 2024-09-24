@@ -504,10 +504,10 @@ body {
     opacity: 1;
     pointer-events: none;
     z-index: 9999; /* Ensure it appears above other elements */
-    animation: fall 1s cubic-bezier(.4, 0, .3, 1) forwards; /* Smooth acceleration */
+    animation: fall 1s cubic-bezier(.4, 0, .8, 1) forwards; /* Smooth acceleration */
     /* Randomize size, colors, and starting positions */
     left: calc(50% - 5px); /* Center initially */
-    animation-duration: 2s; /* Adjust duration for a longer fall */
+    animation-duration: 1s; /* Adjust duration for a longer fall */
 }
 
 /* Randomize the size */
