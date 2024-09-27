@@ -9,7 +9,12 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"
         integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous">
     </script>
-    <script src="./js/main.js"></script>
+    
+    <!-- update the version number as needed -->
+    <script src="/__/firebase/10.13.2/firebase-app-compat.js"></script>
+    <!-- include only the Firebase features as you need -->
+    <script src="/__/firebase/10.13.2/firebase-auth-compat.js"></script>
+    <script src="/__/firebase/init.js?useEmulator=true"></script>
 </head>
 
 <body>
@@ -18,7 +23,17 @@
         <img src="./img/sidebar-icon-black.png" class="menu-icon" id="sidebarIcon" onclick="toggleNav()">
         <img src="./img/logo.png" alt="Taskly" class="logo"/>
         <div class="top-nav">
-            <img src="./img/lightdark-icon-black.png" class="mode-icon" id="lightdarkIcon" onclick="toggleLightDarkMode()">
+            <div class="left-top-navbar">
+                <img src="./img/lightdark-icon-black.png" class="mode-icon" id="lightdarkIcon" onclick="toggleLightDarkMode()">
+                <span class="username"></span> 
+                <div class="user-circle" onclick="toggleDropdown()"></div>
+
+                <!-- Dropdown Menu -->
+                <div class="user-dropdown" id="userDropdown">
+                    <p class="user-email"></p> <!-- User email will be displayed here -->
+                    <button class="logout-button" onclick="signOut()">Log Out</button>
+                </div>
+            </div>
         </div>
 
         <!-- Side Navbar -->
@@ -55,6 +70,7 @@
                 </div>
             </div>
         </div>
+
 
         <div class="main-content">
             <input type="text" id="list-title" value="List 1" onchange="updateNavbarListTitle()" class="list-title" />
@@ -96,5 +112,8 @@
             </div>
         </div>
     </div>
+
+    <script src="./js/main.js"></script>
+    <script src="./js/firebase-auth.js"></script>
 </body>
 </html>

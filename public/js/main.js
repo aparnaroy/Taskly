@@ -337,6 +337,50 @@ function getRandomColor() {
     return color;
 }
 
+// User profile dropdown menu
+function toggleDropdown() {
+    const dropdown = document.getElementById("userDropdown");
+    dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
+}
 
+$(document).ready(function() {
+    // Retrieve user info from sessionStorage
+    const username = sessionStorage.getItem('username');
+    const userInitial = sessionStorage.getItem('userInitial');
+    const email = sessionStorage.getItem('userEmail');
 
+    console.log(username, userInitial, email);
+
+    // Check if username exists, then update the UI
+    if (username) {
+        document.querySelector('.username').textContent = `Welcome, ${username}`;
+        document.querySelector('.user-circle').textContent = userInitial;
+    }
+
+    if (email) {
+        document.querySelector('.user-email').textContent = email;
+    }
+});
+
+// Logout function
+function logout() {
+    firebase.auth().signOut().then(() => {
+        sessionStorage.removeItem('username');
+        sessionStorage.removeItem('userInitial');
+        sessionStorage.removeItem('userEmail'); 
+
+        // window.location.href = "index.html";
+    }).catch((error) => {
+        console.error("Error during logout:", error);
+    });
+}
+
+window.onclick = function(event) {
+    const dropdown = document.getElementById("userDropdown");
+    if (!event.target.matches('.user-circle')) {
+        if (dropdown.style.display === "block") {
+            dropdown.style.display = "none";
+        }
+    }
+};
 

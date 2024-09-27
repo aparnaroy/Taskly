@@ -1,69 +1,49 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Taskly</title>
     <link rel="icon" href="./img/favicon.ico" type="image/x-icon"/>
-    <link href="./css/start-up.css" rel="stylesheet" type="text/css" />
-
+    <link href="./css/home.css" rel="stylesheet" type="text/css" />
+    <link href="./css/home-dark.css" rel="stylesheet" type="text/css" />
+    <link href="./css/main-page.css" rel="stylesheet" type="text/css" />
+    <link href="./css/main-page-dark.css" rel="stylesheet" type="text/css" />
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous">
+    </script>
+    
     <!-- update the version number as needed -->
-    <script defer src="/__/firebase/10.13.2/firebase-app-compat.js"></script>
+    <script src="/__/firebase/10.13.2/firebase-app-compat.js"></script>
     <!-- include only the Firebase features as you need -->
-    <script defer src="/__/firebase/10.13.2/firebase-auth-compat.js"></script>
-    <script defer src="/__/firebase/10.13.2/firebase-database-compat.js"></script>
-    <script defer src="/__/firebase/10.13.2/firebase-firestore-compat.js"></script>
-    <script defer src="/__/firebase/10.13.2/firebase-functions-compat.js"></script>
-    <script defer src="/__/firebase/10.13.2/firebase-messaging-compat.js"></script>
-    <script defer src="/__/firebase/10.13.2/firebase-storage-compat.js"></script>
-    <script defer src="/__/firebase/10.13.2/firebase-analytics-compat.js"></script>
-    <script defer src="/__/firebase/10.13.2/firebase-remote-config-compat.js"></script>
-    <script defer src="/__/firebase/10.13.2/firebase-performance-compat.js"></script>
-    <!-- 
-      initialize the SDK after all desired features are loaded, set useEmulator to false
-      to avoid connecting the SDK to running emulators.
-    -->
-    <script defer src="/__/firebase/init.js?useEmulator=true"></script>
+    <script src="/__/firebase/10.13.2/firebase-auth-compat.js"></script>
+    <script src="/__/firebase/init.js?useEmulator=true"></script>
 </head>
 
 <body>
-  <div class="container">
-      <div class="load-in-container">
-          <img src="./img/white-taskly.png" alt="Taskly" class="title">
-          <div class="line"></div>
-          <p class="subtitle">Write it. Do it. Done.</p>
-      </div>
+    <div class="container">
+        <!-- Top Navbar -->
+        <img src="./img/logo.png" alt="Taskly" class="logo" style="margin-left: -10px;" />
+        <div class="top-nav">
+            <div class="left-top-navbar">
+                <img src="./img/lightdark-icon-black.png" class="mode-icon" id="lightdarkIcon" onclick="toggleLightDarkModeHome()">
+                <!-- Google Log In Button -->
+                <button id="loginButton" class="loginButton" onclick="signIn()">Log In</button>
+            </div>
+        </div>
+        
+        <div class="content">
+          <div class="text-section">
+              <h1 class="big-text">Write it. Do it. Done. We make it easy.</h1>
+              <h4 class="small-text">Your productivity starts here. Say goodbye to messy scribbles and relying on memory to remember all your tasks. Get things done with the #1 to-do app.</p>
+              <button id="loginButton" class="start-button" onclick="signIn()">Get Started Now</button>
+          </div>
+          <div class="image-section">
+              <img src="./img/screenshot.png" alt="Screenshot" id="screenshot">
+          </div>
+        </div>
+    </div>
 
-      <div class="logo-container"></div>
-  </div>
-
-  <script>
-      // Show main page after animations are done
-      setTimeout(() => {
-          window.location.href = "./main-page.html";
-      }, 7200);
-  </script>
-
-  <script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
-
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyC3rRVfezDS4XDhYDaz6gWFhW_rc9VtRNI",
-    authDomain: "taskly-todoapp.firebaseapp.com",
-    projectId: "taskly-todoapp",
-    storageBucket: "taskly-todoapp.appspot.com",
-    messagingSenderId: "673767483459",
-    appId: "1:673767483459:web:32cb19595f8cbb9cdc8cf6",
-    measurementId: "G-8CES8VCF0C"
-  };
-
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-</script>
+    <script src="./js/home.js"></script>
+    <script src="./js/firebase-auth.js"></script>
 </body>
 </html>

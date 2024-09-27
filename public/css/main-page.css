@@ -69,14 +69,87 @@ body {
 }
 
 .mode-icon {
-    position: absolute;
-    top: 18px;
-    right: 45px;
+    /* position: absolute; */
+    /* top: 18px;
+    right: 285px; */
     width: 38px;
     height: auto;
     cursor: pointer;
     z-index: 2;
+} 
+
+.left-top-navbar {
+    display: flex;
+    align-items: center; /* Center align items vertically */
+    margin-left: auto; /* Push to the right end */
+    padding: 20px 10px; /* Optional: Add some padding for spacing */
 }
+
+.username {
+    font-size: 18px; /* Font size for the user's name */
+    color: #333; /* Change color as needed */
+    margin-left: 30px; /* Space between mode-icon and name */
+}
+
+.user-circle {
+    width: 40px; /* Adjust size as needed */
+    height: 40px; /* Adjust size as needed */
+    border-radius: 50%; /* Make it circular */
+    background-color: #3498db; /* Change color as needed */
+    color: white; /* Text color */
+    display: flex;
+    align-items: center; /* Center align text vertically */
+    justify-content: center; /* Center align text horizontally */
+    font-size: 19px; /* Font size for the letter */
+    margin-left: 20px; /* Space between circle and name */
+    transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+}
+
+.user-circle:hover {    
+    background-color: #50abe8; /* Change color as needed */
+    cursor: pointer;
+}
+
+/* Style for the user dropdown */
+.user-dropdown {
+    display: none; /* Hidden by default */
+    position: absolute;
+    top: 80px; /* Adjust based on where you want the dropdown to appear */
+    right: 30px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 12px;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+    width: 220px;
+}
+
+.user-dropdown p {
+    margin: 0;
+    padding-top: 10px;
+    padding-bottom: 20px;
+    font-size: 17px;
+    color: #111;
+}
+
+.logout-button {
+    background-color: #7a11dc; 
+    color: white;
+    border: none;
+    padding: 10px;
+    width: 100%;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 15px;
+    transition: background-color 0.3s ease;
+}
+
+.logout-button:hover {
+    background-color: #54099a; /* Darker on hover */
+}
+
+
   
 /* Side Navigation Bar */
 .side-nav {
@@ -527,3 +600,4 @@ body {
 .dull {
     opacity: 0.4; 
 }
+
