@@ -194,6 +194,38 @@ body {
 
 /******************* Main Contents ********************/
 
+/* Styles for screens smaller than 768px (adjust the width as needed) */
+@media (max-width: 768px) {
+    .side-nav {
+        width: 250px; /* Sidebar takes full width on small screens */
+    }
+
+    .side-nav.open {
+        transform: translateX(100%); /* Overlay the sidebar over the main content */
+    }
+
+    /* Ensure main content stays centered and aligned properly */
+    .main-content.left-align {
+        align-items: center; /* Reset to center alignment */
+    }
+}
+
+/* Reset sidebar and alignment for even smaller screens (mobile) */
+@media (max-width: 480px) {
+    .side-nav {
+        width: 250px; /* Full width on smaller screens */
+    }
+
+    .side-nav.open {
+        transform: translateX(100%); /* Overlay the sidebar over content */
+    }
+
+    /* Reset alignment for smaller screens */
+    .main-content.left-align {
+        align-items: center; /* Reset to centered alignment */
+    }
+}
+
 .main-content {
     display: flex;
     flex-direction: column;
@@ -228,7 +260,8 @@ body {
 
 /* Center the box by default */
 .box {
-    width: 63vw; /* Adjust width as needed */
+    width: calc(100% - 535px); /* Adjust width as needed */
+    min-width: 300px;
     min-height: 400px;
     padding-top: 15px;
     padding-bottom: 15px;
@@ -271,7 +304,7 @@ body {
     display: flex;
     align-items: center;
     bottom: 30px;
-    width: 63vw;
+    width: calc(100% - 140px);
 }
 
 #newTaskInput {

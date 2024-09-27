@@ -50,6 +50,32 @@ function toggleNav() {
     mainContent.classList.toggle('left-align');
 }
 
+// Function to automatically untoggle side-nav and reset layout on resize
+function handleResize() {
+    const sideNav = document.getElementById('side-nav');
+    const mainContent = document.querySelector('.main-content');
+    const sidebarIcon = document.getElementById('sidebarIcon');
+    const lightDarkIcon = document.getElementById('lightdarkIcon');
+
+    // If the screen is too small, untoggle the sidebar and reset alignment
+    if (window.innerWidth <= 768) {
+        sideNav.classList.remove('open'); // Ensure sidebar is hidden
+        mainContent.classList.remove('left-align'); // Ensure main content is centered
+
+        if (lightDarkIcon.src.includes('lightdark-icon-white.png')) {
+            sidebarIcon.src = './img/sidebar-icon-white.png';
+        } else {
+            sidebarIcon.src = './img/sidebar-icon-black.png';
+        }
+    }
+}
+
+// Add an event listener for window resize
+window.addEventListener('resize', handleResize);
+
+// Optionally call the function on page load to ensure layout is correct
+handleResize();
+
 function toggleLightDarkMode() {
     const sidebarIcon = document.getElementById('sidebarIcon');
     const lightDarkIcon = document.getElementById('lightdarkIcon');
