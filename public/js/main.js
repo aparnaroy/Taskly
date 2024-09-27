@@ -36,6 +36,7 @@ window.onscroll = function() {
 function toggleNav() {
     const sidebarIcon = document.getElementById('sidebarIcon');
     const mainContent = document.querySelector('.main-content');
+    const navbarContainer = document.querySelector('.left-top-navbar');
 
     // Toggle between black and white
     if (sidebarIcon.src.includes('sidebar-icon-black.png')) {
@@ -46,8 +47,12 @@ function toggleNav() {
     
     // Toggle sidebar open/close
     $('#side-nav').toggleClass('open');
+    navbarContainer.classList.toggle('open');
     // Toggle left-align class for main content when sidebar is opened/closed
-    mainContent.classList.toggle('left-align');
+    if (window.innerWidth >= 768) {
+        mainContent.classList.toggle('left-align');
+    }
+    navbarContainer.classList.toggle('scrolled');
 }
 
 // Function to automatically untoggle side-nav and reset layout on resize
@@ -56,10 +61,12 @@ function handleResize() {
     const mainContent = document.querySelector('.main-content');
     const sidebarIcon = document.getElementById('sidebarIcon');
     const lightDarkIcon = document.getElementById('lightdarkIcon');
+    const navbarContainer = document.querySelector('.left-top-navbar');
 
     // If the screen is too small, untoggle the sidebar and reset alignment
     if (window.innerWidth <= 768) {
         sideNav.classList.remove('open'); // Ensure sidebar is hidden
+        navbarContainer.classList.remove('open');
         mainContent.classList.remove('left-align'); // Ensure main content is centered
 
         if (lightDarkIcon.src.includes('lightdark-icon-white.png')) {

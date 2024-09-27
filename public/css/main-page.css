@@ -79,6 +79,20 @@ body {
 } 
 
 .left-top-navbar {
+    position: absolute;
+    left: -250px;
+    width: 230px;
+    height: 55px;
+    background-color: #111;;
+    transition: transform 0.5s ease; /* Add transform transition */
+    z-index: 3;
+}
+
+.left-top-navbar.open {
+    transform: translateX(250px); /* Move to the right when the sidebar opens */
+}
+
+.right-top-navbar {
     display: flex;
     align-items: center; /* Center align items vertically */
     margin-left: auto; /* Push to the right end */
@@ -180,6 +194,7 @@ body {
 /* Sidebar Content */
 .side-nav a {
     padding: 10px 45px;
+    max-width: fit-content;
     text-decoration: none;
     font-size: 21px;
     color: #a3a1a1;
@@ -189,6 +204,10 @@ body {
 
 .side-nav a:hover {
     color: #f1f1f1;
+}
+
+#tags .tag-item:last-child {
+    margin-bottom: 120px; /* Or adjust as needed */
 }
 
 
@@ -515,15 +534,6 @@ body {
     justify-content: space-between; /* Align items to the ends */
     width: 100%;
     box-sizing: border-box; 
-}
-
-/* Limit the width of the tag name */
-.tag-name {
-    max-width: 70%; /* Adjust percentage based on how much space you want for tag names */
-    white-space: nowrap;
-    overflow: hidden;
-    word-wrap: break-word;
-    flex: 1;
 }
 
 .color-picker {

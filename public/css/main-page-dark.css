@@ -9,6 +9,10 @@ body.dark-mode .top-nav.scrolled {
     box-shadow: 0 2px 5px rgba(255, 255, 255, 0.05); /* Shadow for depth */
 }
 
+body.dark-mode .left-top-navbar {
+    background-color: #eee; /* Black background */
+}
+
 body.dark-mode .username {
     color: rgb(249, 249, 249)
 }
