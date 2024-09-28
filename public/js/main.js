@@ -120,13 +120,16 @@ function toggleLightDarkMode() {
 
 // Task List Functions
 
-// TODO: Remove click listeners for these 3 that I put elsewhere in this file
 $('#taskList').on('click', '.circle', function(event) {
     taskCompleted(event);
 });
 
 $('#taskList').on('click', '.tag-button', function(event) {
     toggleTagDropdown(event);
+});
+
+$('#taskList').on('blur', '.task-input.task-text', function(event) {
+    updateTask(event);
 });
 
 $('#taskList').on('click', '.delete-button', function(event) {
@@ -169,15 +172,11 @@ function addTask() {
 }
 
 
-$(".task-input.task-text").on('blur', updateTask);
 function updateTask(event) {
     console.log("TODO: update code coming soon");
 }
 
 
-$('.delete-button').on('click', function(event) { 
-    deleteTask(event); 
-});
 function deleteTask(event) {
     const listItem = event.currentTarget.closest('li');
     listItem.style.transition = 'opacity 0.5s ease'; // Add a transition for smooth removal
@@ -191,9 +190,6 @@ function deleteTask(event) {
 
 
 
-$('.circle').on('click', function(event) { 
-    taskCompleted(event); 
-});
 function taskCompleted(event) {
     const listItem = event.currentTarget.closest('li');
     listItem.classList.toggle('completed'); // Toggle the completed class
@@ -347,9 +343,6 @@ function getTags() {
 
 // TODO: Hide tag dropdown when clicking elsewhere
 // Function to toggle the visibility of the tag dropdown
-$('.tag-button').on('click', function(event) {
-    toggleTagDropdown(event);
-});
 function toggleTagDropdown(event) {
     const dropdown = event.target.nextElementSibling; // Find the corresponding dropdown div
     const tags = getTags(); // Fetch the tags from the side navbar
