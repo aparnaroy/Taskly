@@ -1,3 +1,5 @@
+// TODO: Add updateTask() function to save task updates
+
 // Document ready function
 $(function () {
     // Update tag color as soon as it is changed in the color picker
@@ -159,7 +161,7 @@ function addNewList() {
 }
 
 function updateNavbarListTitle() {
-    const newTitle = document.getElementById('list-title').value;
+    const newTitle = document.getElementById('list-title').textContent;
     const navbarTitle = document.querySelector('#lists a'); // Update the correct selector based on your HTML structure
 
     navbarTitle.textContent = newTitle; // Update the navbar title
@@ -402,19 +404,6 @@ $(document).ready(function() {
     // Call the function on page load to ensure layout is correct
     handleResize();
 });
-
-// Logout function
-function logout() {
-    firebase.auth().signOut().then(() => {
-        sessionStorage.removeItem('username');
-        sessionStorage.removeItem('userInitial');
-        sessionStorage.removeItem('userEmail'); 
-
-        // window.location.href = "index.html";
-    }).catch((error) => {
-        console.error("Error during logout:", error);
-    });
-}
 
 window.onclick = function(event) {
     const dropdown = document.getElementById("userDropdown");

@@ -27,7 +27,7 @@
         <div class="top-nav">
             <div class="right-top-navbar">
                 <img src="./img/lightdark-icon-black.png" class="mode-icon" id="lightdarkIcon" onclick="toggleLightDarkMode()">
-                <span class="username">Welcome, aparna Roy</span> 
+                <span class="username"></span> 
                 <div class="user-circle" onclick="toggleDropdown()"></div>
 
                 <!-- Dropdown Menu -->
@@ -75,9 +75,10 @@
 
 
         <div class="main-content">
-            <input type="text" id="list-title" value="List 1" onchange="updateNavbarListTitle()" class="list-title" />
+            <div id="list-title" contenteditable="true" onblur="updateNavbarListTitle()" class="list-title">List 1</div> 
             <div class="box">
                 <ul id="taskList">
+                    <!----------- TODO: Change updateTask() function onchange to onblur ----------->
                     <li>
                         <div class="circle" onclick="taskCompleted(event)"></div>
                         <div class="task-input task-text" contenteditable="true" onchange="updateTask(event)">Task 1</div>
