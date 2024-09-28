@@ -414,3 +414,48 @@ window.onclick = function(event) {
     }
 };
 
+
+// Context Menu for Right-Clicking on a list or tag item and deleting it
+
+// Select all list and tag items
+const listItems = document.querySelectorAll('.list-item');
+const tagItems = document.querySelectorAll('.tag-item');
+const contextMenu = document.getElementById('context-menu');
+let targetElement = null; // To store which element is right-clicked
+
+// Function to add right-click event listener
+function addRightClickListener(items) {
+    items.forEach(item => {
+        item.addEventListener('contextmenu', function(event) {
+            event.preventDefault(); // Prevent default context menu
+
+            // Store the right-clicked element (list-item or tag-item)
+            targetElement = event.target.closest('.list-item, .tag-item');
+
+            let x = event.pageX + 10;
+            let y = event.pageY + 10;
+            // Position the custom context menu
+            contextMenu.style.display = 'block';
+            contextMenu.style.left = `${x}px`;
+            contextMenu.style.top = `${y}px`;
+        });
+    });
+}
+
+// Add right-click listeners to list and tag items
+addRightClickListener(listItems);
+addRightClickListener(tagItems);
+
+// Hide context menu on clicking elsewhere
+document.addEventListener('click', function() {
+    contextMenu.style.display = 'none';
+});
+
+// Handle delete option click
+document.getElementById('delete-option').addEventListener('click', function() {
+    if (targetElement) {
+        targetElement.remove(); // Delete the right-clicked list-item or tag-item
+        targetElement = null;   // Clear the reference
+        contextMenu.style.display = 'none'; // Hide the context menu
+    }
+});

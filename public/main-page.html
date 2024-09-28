@@ -45,9 +45,15 @@
                     My Lists
                     <img src="./img/add.png" class="add-list" onclick="addNewList()" alt="Add"/>
                 </h2>
-                <a href="#">List 1</a>
-                <a href="#">List 2</a>
-                <a href="#">List 3</a>
+                <div class="list-item">
+                    <a href="#">List 1</a>
+                </div>
+                <div class="list-item">
+                    <a href="#">List 2</a>
+                </div>
+                <div class="list-item">
+                    <a href="#">List 3</a>
+                </div>
             </div>
             <div id="tags">
                 <h2>
@@ -72,6 +78,11 @@
                 </div>
             </div>
         </div>
+
+        <!-- Context Menu Shown on Right Click -->
+        <ul id="context-menu" class="context-menu">
+            <li id="delete-option">Delete</li>
+        </ul>
 
 
         <div class="main-content">

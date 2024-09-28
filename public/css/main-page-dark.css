@@ -52,6 +52,14 @@ body.dark-mode #list-title:focus {
     border-bottom: 1px solid #eee; /* Optional: underline on focus */
 }
 
+body.dark-mode .list-item:hover {
+    background-color: #d6d4d4;
+}
+
+body.dark-mode .tag-item:hover {
+    background-color: #d6d4d4;
+}
+
 body.dark-mode .box {
     background-color: #111;
 }
