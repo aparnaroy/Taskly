@@ -82,7 +82,7 @@ body {
     position: fixed;
     left: -250px;
     width: 230px;
-    height: 55px;
+    height: 61px;
     background-color: #111;;
     transition: transform 0.5s ease; /* Add transform transition */
     z-index: 3;
@@ -175,7 +175,7 @@ body {
     background-color: #111; /* Black background */
     overflow-y: auto; /* Enable vertical scrolling if needed */
     transition: transform 0.5s ease; /* Smooth transition for the sidebar */
-    padding-top: 70px; /* Start a little below the top */
+    padding-top: 80px; /* Start a little below the top */
     z-index: 2;
 }
 
@@ -193,7 +193,7 @@ body {
 
 /* Sidebar Content */
 .side-nav a {
-    padding: 10px 45px;
+    padding: 11px 45px;
     max-width: fit-content;
     text-decoration: none;
     font-size: 21px;
@@ -207,7 +207,29 @@ body {
 }
 
 #tags .tag-item:last-child {
-    margin-bottom: 120px; /* Or adjust as needed */
+    margin-bottom: 170px;
+}
+
+
+.context-menu {
+    display: none;
+    position: absolute;
+    background-color: rgb(219, 6, 6);
+    color: white;
+    border-radius: 3px;
+    list-style-type: none;
+    padding: 7px;
+    margin: 0;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    z-index: 999;
+    transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+}
+.context-menu li {
+    padding: 4px 10px;
+    cursor: pointer;
+}
+.context-menu:hover {
+    background-color: rgb(174, 0, 0);
 }
 
 
@@ -286,7 +308,7 @@ body {
     padding-bottom: 15px;
     padding-left: 70px;
     padding-right: 70px;
-    margin-bottom: 50px;
+    margin-bottom: 90px;
     background-color: white;
     border-radius: 30px;
     box-shadow: 30px 40px 30px rgba(0, 0, 0, 0.2);
@@ -534,6 +556,11 @@ body {
     justify-content: space-between; /* Align items to the ends */
     width: 100%;
     box-sizing: border-box; 
+    transition: background-color 0.5s ease; /* Smooth transition for hover effect */
+}
+
+.tag-item:hover {
+    background-color: #272727;
 }
 
 .color-picker {
@@ -546,6 +573,13 @@ body {
     margin-left: 10px;
     margin-right: 28px;
     border-radius: 20%;
+}
+
+.list-item {
+    transition: background-color 0.5s ease; /* Smooth transition for hover effect */
+}
+.list-item:hover {
+    background-color: #272727;
 }
 
 
