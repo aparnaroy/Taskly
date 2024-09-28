@@ -1,3 +1,6 @@
+import { firebaseApp, database } from './firebase-auth.js';
+
+
 // TODO: Add updateTask() function to save task updates
 
 // Document ready function
@@ -114,20 +117,38 @@ function toggleLightDarkMode() {
 
 
 // Task List Functions
+$('#addButton').on('click', addTask);
 
 function addTask() {
     const input = document.getElementById('newTaskInput');
     const taskList = document.getElementById('taskList');
 
-    if (input.value.trim() === '') return; // Ignore empty input
+    const taskText = input.value;
+    
+    if (taskText.trim() === '') return; // Ignore empty input
 
-    const newTask = document.createElement('li');
-    newTask.innerHTML = `<div class="circle" onclick="taskCompleted(event)"></div>
-                        <div class="task-input task-text" contenteditable="true" onchange="updateTask(event)">${input.value}</div>
-                        <img src="./img/tag.png" class="tag-button" onclick="toggleTagDropdown(event)" />
-                        <div class="tag-dropdown"></div>
-                        <img src="./img/delete.png" class="delete-button" onclick="deleteTask(event)" alt="Delete"/>`;
-    taskList.appendChild(newTask);
+    const userId = firebaseApp.auth().currentUser.uid; // Get the current user's ID
+    console.log(userId);
+    const taskRef = database.ref('tasks/' + userId).push(); // Create a new reference for the task
+
+    // Save the task to Firebase
+    taskRef.set({
+        task: taskText,
+        done: false
+    }).then(() => {
+        console.log(taskText);
+        // Create and display the new task in the UI after saving to Firebase
+        const newTask = document.createElement('li');
+        newTask.setAttribute('data-task-id', taskRef.key); // Store the task ID for later use
+        newTask.innerHTML = `<div class="circle" onclick="taskCompleted(event)"></div>
+                             <div class="task-input task-text" contenteditable="true" onchange="updateTask(event)">${taskText}</div>
+                             <img src="./img/tag.png" class="tag-button" onclick="toggleTagDropdown(event)" />
+                             <div class="tag-dropdown"></div>
+                             <img src="./img/delete.png" class="delete-button" onclick="deleteTask(event)" alt="Delete"/>`;
+        taskList.appendChild(newTask);
+    }).catch((error) => {
+        console.error('Error adding task:', error);
+    });
 
     input.value = ''; // Clear the input field
 }
