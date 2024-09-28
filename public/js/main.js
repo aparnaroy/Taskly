@@ -120,6 +120,19 @@ function toggleLightDarkMode() {
 
 // Task List Functions
 
+// TODO: Remove click listeners for these 3 that I put elsewhere in this file
+$('#taskList').on('click', '.circle', function(event) {
+    taskCompleted(event);
+});
+
+$('#taskList').on('click', '.tag-button', function(event) {
+    toggleTagDropdown(event);
+});
+
+$('#taskList').on('click', '.delete-button', function(event) {
+    deleteTask(event);
+});
+
 $('#addButton').on('click', addTask);
 function addTask() {
     const input = document.getElementById('newTaskInput');
@@ -332,6 +345,7 @@ function getTags() {
     return Array.from(tagElements).map(tag => tag.textContent);
 }
 
+// TODO: Hide tag dropdown when clicking elsewhere
 // Function to toggle the visibility of the tag dropdown
 $('.tag-button').on('click', function(event) {
     toggleTagDropdown(event);
