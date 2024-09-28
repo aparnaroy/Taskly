@@ -1,3 +1,5 @@
+// TODO: Add updateTask() function to save task updates
+
 // Document ready function
 $(function () {
     // Update tag color as soon as it is changed in the color picker
@@ -159,7 +161,7 @@ function addNewList() {
 }
 
 function updateNavbarListTitle() {
-    const newTitle = document.getElementById('list-title').value;
+    const newTitle = document.getElementById('list-title').textContent;
     const navbarTitle = document.querySelector('#lists a'); // Update the correct selector based on your HTML structure
 
     navbarTitle.textContent = newTitle; // Update the navbar title
