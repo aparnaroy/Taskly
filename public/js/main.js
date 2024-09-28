@@ -472,11 +472,19 @@ $(document).ready(function() {
 });
 
 window.onclick = function(event) {
-    const dropdown = document.getElementById("userDropdown");
+    const userDropdown = document.getElementById("userDropdown");
     if (!event.target.matches('.user-circle')) {
-        if (dropdown.style.display === "block") {
-            dropdown.style.display = "none";
+        if (userDropdown.style.display === "block") {
+            userDropdown.style.display = "none";
         }
+    }
+
+    if (!event.target.closest('.tag-button') && !event.target.closest('.tag-dropdown')) {
+        // Get all dropdowns
+        const tagDropdowns = document.querySelectorAll('.tag-dropdown.visible');
+        tagDropdowns.forEach(dropdown => {
+            dropdown.classList.remove('visible'); // Hide all visible dropdowns
+        });
     }
 };
 
