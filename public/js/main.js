@@ -62,7 +62,15 @@ function handleResize() {
     const sidebarIcon = document.getElementById('sidebarIcon');
     const lightDarkIcon = document.getElementById('lightdarkIcon');
     const navbarContainer = document.querySelector('.left-top-navbar');
+    const username = document.querySelector('.username');
 
+    // Hide username if screen is too small
+    if (window.innerWidth <= 600) { 
+        username.style.display = 'none';
+    } else {
+        username.style.display = 'flex';
+    }
+    
     // If the screen is too small, untoggle the sidebar and reset alignment
     if (window.innerWidth <= 768) {
         sideNav.classList.remove('open'); // Ensure sidebar is hidden
@@ -79,9 +87,6 @@ function handleResize() {
 
 // Add an event listener for window resize
 window.addEventListener('resize', handleResize);
-
-// Optionally call the function on page load to ensure layout is correct
-handleResize();
 
 function toggleLightDarkMode() {
     const sidebarIcon = document.getElementById('sidebarIcon');
@@ -393,6 +398,9 @@ $(document).ready(function() {
     if (email) {
         document.querySelector('.user-email').textContent = email;
     }
+
+    // Call the function on page load to ensure layout is correct
+    handleResize();
 });
 
 // Logout function
