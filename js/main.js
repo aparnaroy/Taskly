@@ -36,6 +36,7 @@ window.onscroll = function() {
 function toggleNav() {
     const sidebarIcon = document.getElementById('sidebarIcon');
     const mainContent = document.querySelector('.main-content');
+    const navbarContainer = document.querySelector('.left-top-navbar');
 
     // Toggle between black and white
     if (sidebarIcon.src.includes('sidebar-icon-black.png')) {
@@ -46,9 +47,46 @@ function toggleNav() {
     
     // Toggle sidebar open/close
     $('#side-nav').toggleClass('open');
+    navbarContainer.classList.toggle('open');
     // Toggle left-align class for main content when sidebar is opened/closed
-    mainContent.classList.toggle('left-align');
+    if (window.innerWidth >= 768) {
+        mainContent.classList.toggle('left-align');
+    }
+    navbarContainer.classList.toggle('scrolled');
 }
+
+// Function to automatically untoggle side-nav and reset layout on resize
+function handleResize() {
+    const sideNav = document.getElementById('side-nav');
+    const mainContent = document.querySelector('.main-content');
+    const sidebarIcon = document.getElementById('sidebarIcon');
+    const lightDarkIcon = document.getElementById('lightdarkIcon');
+    const navbarContainer = document.querySelector('.left-top-navbar');
+    const username = document.querySelector('.username');
+
+    // Hide username if screen is too small
+    if (window.innerWidth <= 600) { 
+        username.style.display = 'none';
+    } else {
+        username.style.display = 'flex';
+    }
+    
+    // If the screen is too small, untoggle the sidebar and reset alignment
+    if (window.innerWidth <= 768) {
+        sideNav.classList.remove('open'); // Ensure sidebar is hidden
+        navbarContainer.classList.remove('open');
+        mainContent.classList.remove('left-align'); // Ensure main content is centered
+
+        if (lightDarkIcon.src.includes('lightdark-icon-white.png')) {
+            sidebarIcon.src = './img/sidebar-icon-white.png';
+        } else {
+            sidebarIcon.src = './img/sidebar-icon-black.png';
+        }
+    }
+}
+
+// Add an event listener for window resize
+window.addEventListener('resize', handleResize);
 
 function toggleLightDarkMode() {
     const sidebarIcon = document.getElementById('sidebarIcon');
@@ -337,6 +375,39 @@ function getRandomColor() {
     return color;
 }
 
+// User profile dropdown menu
+function toggleDropdown() {
+    const dropdown = document.getElementById("userDropdown");
+    dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
+}
 
+$(document).ready(function() {
+    // Retrieve user info from sessionStorage
+    const username = sessionStorage.getItem('username');
+    const userInitial = sessionStorage.getItem('userInitial');
+    const email = sessionStorage.getItem('userEmail');
 
+    console.log(username, userInitial, email);
 
+    // Check if username exists, then update the UI
+    if (username) {
+        document.querySelector('.username').textContent = `Welcome, ${username}`;
+        document.querySelector('.user-circle').textContent = userInitial;
+    }
+
+    if (email) {
+        document.querySelector('.user-email').textContent = email;
+    }
+
+    // Call the function on page load to ensure layout is correct
+    handleResize();
+});
+
+window.onclick = function(event) {
+    const dropdown = document.getElementById("userDropdown");
+    if (!event.target.matches('.user-circle')) {
+        if (dropdown.style.display === "block") {
+            dropdown.style.display = "none";
+        }
+    }
+};

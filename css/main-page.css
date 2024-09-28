@@ -69,14 +69,101 @@ body {
 }
 
 .mode-icon {
-    position: absolute;
-    top: 18px;
-    right: 45px;
+    /* position: absolute; */
+    /* top: 18px;
+    right: 285px; */
     width: 38px;
     height: auto;
     cursor: pointer;
     z-index: 2;
+} 
+
+.left-top-navbar {
+    position: absolute;
+    left: -250px;
+    width: 230px;
+    height: 55px;
+    background-color: #111;;
+    transition: transform 0.5s ease; /* Add transform transition */
+    z-index: 3;
 }
+
+.left-top-navbar.open {
+    transform: translateX(250px); /* Move to the right when the sidebar opens */
+}
+
+.right-top-navbar {
+    display: flex;
+    align-items: center; /* Center align items vertically */
+    margin-left: auto; /* Push to the right end */
+    padding: 20px 10px; /* Optional: Add some padding for spacing */
+}
+
+.username {
+    font-size: 18px; /* Font size for the user's name */
+    color: #333; /* Change color as needed */
+    margin-left: 30px; /* Space between mode-icon and name */
+}
+
+.user-circle {
+    width: 40px; /* Adjust size as needed */
+    height: 40px; /* Adjust size as needed */
+    border-radius: 50%; /* Make it circular */
+    background-color: #3498db; /* Change color as needed */
+    color: white; /* Text color */
+    display: flex;
+    align-items: center; /* Center align text vertically */
+    justify-content: center; /* Center align text horizontally */
+    font-size: 19px; /* Font size for the letter */
+    margin-left: 20px; /* Space between circle and name */
+    transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+}
+
+.user-circle:hover {    
+    background-color: #50abe8; /* Change color as needed */
+    cursor: pointer;
+}
+
+/* Style for the user dropdown */
+.user-dropdown {
+    display: none; /* Hidden by default */
+    position: absolute;
+    top: 80px; /* Adjust based on where you want the dropdown to appear */
+    right: 30px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 12px;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+    width: 220px;
+}
+
+.user-dropdown p {
+    margin: 0;
+    padding-top: 10px;
+    padding-bottom: 20px;
+    font-size: 17px;
+    color: #111;
+}
+
+.logout-button {
+    background-color: #7a11dc; 
+    color: white;
+    border: none;
+    padding: 10px;
+    width: 100%;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 15px;
+    transition: background-color 0.3s ease;
+}
+
+.logout-button:hover {
+    background-color: #54099a; /* Darker on hover */
+}
+
+
   
 /* Side Navigation Bar */
 .side-nav {
@@ -107,6 +194,7 @@ body {
 /* Sidebar Content */
 .side-nav a {
     padding: 10px 45px;
+    max-width: fit-content;
     text-decoration: none;
     font-size: 21px;
     color: #a3a1a1;
@@ -118,8 +206,44 @@ body {
     color: #f1f1f1;
 }
 
+#tags .tag-item:last-child {
+    margin-bottom: 120px; /* Or adjust as needed */
+}
+
 
 /******************* Main Contents ********************/
+
+/* Styles for screens smaller than 768px (adjust the width as needed) */
+@media (max-width: 768px) {
+    .side-nav {
+        width: 250px; /* Sidebar takes full width on small screens */
+    }
+
+    .side-nav.open {
+        transform: translateX(100%); /* Overlay the sidebar over the main content */
+    }
+
+    /* Ensure main content stays centered and aligned properly */
+    .main-content.left-align {
+        align-items: center; /* Reset to center alignment */
+    }
+}
+
+/* Reset sidebar and alignment for even smaller screens (mobile) */
+@media (max-width: 480px) {
+    .side-nav {
+        width: 250px; /* Full width on smaller screens */
+    }
+
+    .side-nav.open {
+        transform: translateX(100%); /* Overlay the sidebar over content */
+    }
+
+    /* Reset alignment for smaller screens */
+    .main-content.left-align {
+        align-items: center; /* Reset to centered alignment */
+    }
+}
 
 .main-content {
     display: flex;
@@ -155,7 +279,8 @@ body {
 
 /* Center the box by default */
 .box {
-    width: 63vw; /* Adjust width as needed */
+    width: calc(100% - 535px); /* Adjust width as needed */
+    min-width: 300px;
     min-height: 400px;
     padding-top: 15px;
     padding-bottom: 15px;
@@ -198,7 +323,7 @@ body {
     display: flex;
     align-items: center;
     bottom: 30px;
-    width: 63vw;
+    width: calc(100% - 140px);
 }
 
 #newTaskInput {
@@ -411,15 +536,6 @@ body {
     box-sizing: border-box; 
 }
 
-/* Limit the width of the tag name */
-.tag-name {
-    max-width: 70%; /* Adjust percentage based on how much space you want for tag names */
-    white-space: nowrap;
-    overflow: hidden;
-    word-wrap: break-word;
-    flex: 1;
-}
-
 .color-picker {
     flex-shrink: 0;
     cursor: pointer;
@@ -504,10 +620,10 @@ body {
     opacity: 1;
     pointer-events: none;
     z-index: 9999; /* Ensure it appears above other elements */
-    animation: fall 1s cubic-bezier(.4, 0, .3, 1) forwards; /* Smooth acceleration */
+    animation: fall 1s cubic-bezier(.4, 0, .8, 1) forwards; /* Smooth acceleration */
     /* Randomize size, colors, and starting positions */
     left: calc(50% - 5px); /* Center initially */
-    animation-duration: 2s; /* Adjust duration for a longer fall */
+    animation-duration: 1s; /* Adjust duration for a longer fall */
 }
 
 /* Randomize the size */

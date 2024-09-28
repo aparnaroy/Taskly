@@ -9,16 +9,28 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"
         integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous">
     </script>
-    <script src="./js/main.js"></script>
 </head>
 
 <body>
     <div class="container">
         <!-- Top Navbar -->
+        <div class="left-top-navbar" style="padding: 10px;"></div>
         <img src="./img/sidebar-icon-black.png" class="menu-icon" id="sidebarIcon" onclick="toggleNav()">
         <img src="./img/logo.png" alt="Taskly" class="logo"/>
+        
         <div class="top-nav">
-            <img src="./img/lightdark-icon-black.png" class="mode-icon" id="lightdarkIcon" onclick="toggleLightDarkMode()">
+            <div class="right-top-navbar">
+                <img src="./img/lightdark-icon-black.png" class="mode-icon" id="lightdarkIcon" onclick="toggleLightDarkMode()">
+                <!------- TODO: Remove placeholder username, user-circle, and user-email text -------->
+                <span class="username">Welcome, Royal Devil</span> 
+                <div class="user-circle" onclick="toggleDropdown()">R</div>
+
+                <!-- Dropdown Menu -->
+                <div class="user-dropdown" id="userDropdown">
+                    <p class="user-email">royaldevil@gmail.com</p> <!-- User email will be displayed here -->
+                    <button class="logout-button" onclick="signOut()">Log Out</button>
+                </div>
+            </div>
         </div>
 
         <!-- Side Navbar -->
@@ -55,6 +67,7 @@
                 </div>
             </div>
         </div>
+
 
         <div class="main-content">
             <input type="text" id="list-title" value="List 1" onchange="updateNavbarListTitle()" class="list-title" />
@@ -96,5 +109,8 @@
             </div>
         </div>
     </div>
+
+    <script src="./js/main.js"></script>
+    <script src="./js/auth.js"></script>
 </body>
 </html>
