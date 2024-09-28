@@ -15,6 +15,8 @@ const auth = firebaseApp.auth();
 const provider = new firebase.auth.GoogleAuthProvider();
 export const database = firebaseApp.database();
 
+$("#loginButton").click(signIn);
+$("#loginButton2").click(signIn);
 function signIn() {
     auth.signInWithPopup(provider)
     .then((result) => {
@@ -35,6 +37,7 @@ function signIn() {
     });
 }
 
+$(".logout-button").click(signOut);
 function signOut() {
     auth.signOut()
       .then(() => {

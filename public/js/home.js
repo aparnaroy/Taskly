@@ -8,6 +8,7 @@ window.onscroll = function() {
     }
 };
 
+$('#lightdarkIcon').on('click', toggleLightDarkModeHome);
 function toggleLightDarkModeHome() {
     const lightDarkIcon = document.getElementById('lightdarkIcon');
     const screenshot = document.getElementById('screenshot');

@@ -1,8 +1,5 @@
 import { firebaseApp, database } from './firebase-auth.js';
 
-
-// TODO: Add updateTask() function to save task updates
-
 // Document ready function
 $(function () {
     // Update tag color as soon as it is changed in the color picker
@@ -38,6 +35,7 @@ window.onscroll = function() {
     }
 };
 
+$("#sidebarIcon").click(toggleNav);
 function toggleNav() {
     const sidebarIcon = document.getElementById('sidebarIcon');
     const mainContent = document.querySelector('.main-content');
@@ -93,6 +91,7 @@ function handleResize() {
 // Add an event listener for window resize
 window.addEventListener('resize', handleResize);
 
+$("#lightdarkIcon").click(toggleLightDarkMode);
 function toggleLightDarkMode() {
     const sidebarIcon = document.getElementById('sidebarIcon');
     const lightDarkIcon = document.getElementById('lightdarkIcon');
@@ -116,9 +115,12 @@ function toggleLightDarkMode() {
 }
 
 
-// Task List Functions
-$('#addButton').on('click', addTask);
 
+
+
+// Task List Functions
+
+$('#addButton').on('click', addTask);
 function addTask() {
     const input = document.getElementById('newTaskInput');
     const taskList = document.getElementById('taskList');
@@ -140,11 +142,11 @@ function addTask() {
         // Create and display the new task in the UI after saving to Firebase
         const newTask = document.createElement('li');
         newTask.setAttribute('data-task-id', taskRef.key); // Store the task ID for later use
-        newTask.innerHTML = `<div class="circle" onclick="taskCompleted(event)"></div>
-                             <div class="task-input task-text" contenteditable="true" onchange="updateTask(event)">${taskText}</div>
-                             <img src="./img/tag.png" class="tag-button" onclick="toggleTagDropdown(event)" />
+        newTask.innerHTML = `<div class="circle"></div>
+                             <div class="task-input task-text" contenteditable="true">${taskText}</div>
+                             <img src="./img/tag.png" class="tag-button" />
                              <div class="tag-dropdown"></div>
-                             <img src="./img/delete.png" class="delete-button" onclick="deleteTask(event)" alt="Delete"/>`;
+                             <img src="./img/delete.png" class="delete-button" alt="Delete"/>`;
         taskList.appendChild(newTask);
     }).catch((error) => {
         console.error('Error adding task:', error);
@@ -153,6 +155,16 @@ function addTask() {
     input.value = ''; // Clear the input field
 }
 
+
+$(".task-input.task-text").on('blur', updateTask);
+function updateTask(event) {
+    console.log("TODO: update code coming soon");
+}
+
+
+$('.delete-button').on('click', function(event) { 
+    deleteTask(event); 
+});
 function deleteTask(event) {
     const listItem = event.currentTarget.closest('li');
     listItem.style.transition = 'opacity 0.5s ease'; // Add a transition for smooth removal
@@ -164,31 +176,11 @@ function deleteTask(event) {
     }, 500); // Match the duration with the CSS transition
 }
 
-function addNewList() {
-    const listName = prompt("Enter the name of your new list:");
-
-    if (listName && listName.trim() !== '') {
-        const lists = document.getElementById('lists');
-
-        const newList = document.createElement('a');
-        newList.href = "#"; // Set link as needed
-        newList.textContent = listName; // Set the name of the list
-        newList.className = ''; // Add any necessary classes
-
-        lists.appendChild(newList); // Append to the sidebar
-    } else {
-        alert("List name cannot be empty.");
-    }
-}
-
-function updateNavbarListTitle() {
-    const newTitle = document.getElementById('list-title').textContent;
-    const navbarTitle = document.querySelector('#lists a'); // Update the correct selector based on your HTML structure
-
-    navbarTitle.textContent = newTitle; // Update the navbar title
-}
 
 
+$('.circle').on('click', function(event) { 
+    taskCompleted(event); 
+});
 function taskCompleted(event) {
     const listItem = event.currentTarget.closest('li');
     listItem.classList.toggle('completed'); // Toggle the completed class
@@ -255,7 +247,84 @@ function createConfetti() {
 }
 
 
+
+// List Functions
+
+$(".add-list").click(addNewList);
+function addNewList() {
+    const listName = prompt("Enter the name of your new list:");
+
+    if (listName && listName.trim() !== '') {
+        const lists = document.getElementById('lists');
+
+        const newList = document.createElement('a');
+        newList.href = "#"; // Set link as needed
+        newList.textContent = listName; // Set the name of the list
+        newList.className = ''; // Add any necessary classes
+
+        lists.appendChild(newList); // Append to the sidebar
+    } else {
+        alert("List name cannot be empty.");
+    }
+}
+
+
+$("#list-title").on('blur', updateListTitle);
+function updateListTitle() {
+    const newTitle = document.getElementById('list-title').textContent;
+    const navbarTitle = document.querySelector('#lists a'); // Update the correct selector based on your HTML structure
+
+    navbarTitle.textContent = newTitle; // Update the navbar title
+}
+
+
+
 // Tag Functions
+
+$(".add-tag").click(addNewTag);
+function addNewTag() {
+    const tagName = prompt("Enter the name of your new tag:");
+
+    if (tagName && tagName.trim() !== '') {
+        // Create a new tag item element
+        const tagItem = document.createElement('div');
+        tagItem.className = 'tag-item';
+
+        // Create the tag link
+        const tagLink = document.createElement('a');
+        tagLink.href = "#";
+        tagLink.className = 'tag-name';
+        tagLink.textContent = tagName;
+
+        // Create the color picker
+        const colorPicker = document.createElement('input');
+        colorPicker.type = 'color';
+        colorPicker.className = 'color-picker';
+        colorPicker.value = getRandomColor(); // Set random color
+        
+        // Append elements to the tag item
+        tagItem.appendChild(tagLink);
+        tagItem.appendChild(colorPicker);
+
+        // Append the new tag item to the tags div
+        document.getElementById('tags').appendChild(tagItem);
+        
+        // Add event listener to the color picker
+        colorPicker.addEventListener('input', updateTagColor);
+    } else {
+        alert("Tag name cannot be empty.");
+    }
+}
+
+// Function to generate a random color
+function getRandomColor() {
+    const letters = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+}
 
 // Function to get the tags from the side navbar
 function getTags() {
@@ -264,6 +333,9 @@ function getTags() {
 }
 
 // Function to toggle the visibility of the tag dropdown
+$('.tag-button').on('click', function(event) {
+    toggleTagDropdown(event);
+});
 function toggleTagDropdown(event) {
     const dropdown = event.target.nextElementSibling; // Find the corresponding dropdown div
     const tags = getTags(); // Fetch the tags from the side navbar
@@ -354,51 +426,10 @@ function updateTagColor(event) {
     });
 }
 
-function addNewTag() {
-    const tagName = prompt("Enter the name of your new tag:");
 
-    if (tagName && tagName.trim() !== '') {
-        // Create a new tag item element
-        const tagItem = document.createElement('div');
-        tagItem.className = 'tag-item';
-
-        // Create the tag link
-        const tagLink = document.createElement('a');
-        tagLink.href = "#";
-        tagLink.className = 'tag-name';
-        tagLink.textContent = tagName;
-
-        // Create the color picker
-        const colorPicker = document.createElement('input');
-        colorPicker.type = 'color';
-        colorPicker.className = 'color-picker';
-        colorPicker.value = getRandomColor(); // Set random color
-        
-        // Append elements to the tag item
-        tagItem.appendChild(tagLink);
-        tagItem.appendChild(colorPicker);
-
-        // Append the new tag item to the tags div
-        document.getElementById('tags').appendChild(tagItem);
-        
-        // Add event listener to the color picker
-        colorPicker.addEventListener('input', updateTagColor);
-    } else {
-        alert("Tag name cannot be empty.");
-    }
-}
-
-// Function to generate a random color
-function getRandomColor() {
-    const letters = '0123456789ABCDEF';
-    let color = '#';
-    for (let i = 0; i < 6; i++) {
-        color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
-}
 
 // User profile dropdown menu
+$(".user-circle").click(toggleDropdown);
 function toggleDropdown() {
     const dropdown = document.getElementById("userDropdown");
     dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
