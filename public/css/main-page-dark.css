@@ -53,11 +53,15 @@ body.dark-mode #list-title:focus {
 }
 
 body.dark-mode .list-item:hover {
-    background-color: #d6d4d4;
+    background-color: #d3d3d3;
 }
 
 body.dark-mode .tag-item:hover {
-    background-color: #d6d4d4;
+    background-color: #d3d3d3;
+}
+
+body.dark-mode .selected-list {
+    background-color: #d3d3d3;
 }
 
 body.dark-mode .box {

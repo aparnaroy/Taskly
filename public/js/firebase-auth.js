@@ -11,7 +11,7 @@ const firebaseConfig = {
 
 export const firebaseApp = firebase.initializeApp(firebaseConfig);
 
-const auth = firebaseApp.auth();
+export const auth = firebaseApp.auth();
 const provider = new firebase.auth.GoogleAuthProvider();
 export const database = firebaseApp.database();
 
@@ -19,32 +19,36 @@ $("#loginButton").click(signIn);
 $("#loginButton2").click(signIn);
 function signIn() {
     auth.signInWithPopup(provider)
-    .then((result) => {
-        const user = result.user;
-        // $('.username').text(`Welcome, ${user.displayName}`);
-        // $('.user-circle').text(user.displayName.charAt(0));
-        
-        // Store user info in sessionStorage
-        sessionStorage.setItem('username', user.displayName);
-        sessionStorage.setItem('userInitial', user.displayName.charAt(0));
-        sessionStorage.setItem('userEmail', user.email);
+        .then((result) => {
+            const user = result.user;
+            // Store user info in the database
+            const userRef = database.ref('users/' + user.uid);
+            userRef.set({
+                displayName: user.displayName,
+                email: user.email,
+                // Add any additional user info you want to store
+                // TODO: add random user profile icon color
+            });
 
-        window.location.href = "start-up.html";
-        // window.location.href = "main-page.html";
-    })
-    .catch((error) => {
-        console.error('Error during sign-in:', error);
-    });
+            // Wait for authentication state to be updated
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    console.log('User UID:', user.uid);
+                    window.location.href = "main-page.html"
+                    // TODO: change to start-up
+                }
+            });
+        })
+        .catch((error) => {
+            console.error('Error during sign-in:', error);
+        });
 }
+
 
 $(".logout-button").click(signOut);
 function signOut() {
     auth.signOut()
       .then(() => {
-          sessionStorage.removeItem('username');
-          sessionStorage.removeItem('userInitial');
-          sessionStorage.removeItem('userEmail'); 
-
           window.location.href = "index.html";
           // console.log('User signed out.');
       })

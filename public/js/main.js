@@ -1,4 +1,4 @@
-import { firebaseApp, database } from './firebase-auth.js';
+import { firebaseApp, auth, database } from './firebase-auth.js';
 
 // Document ready function
 $(function () {
@@ -142,22 +142,28 @@ function addTask() {
     const taskList = document.getElementById('taskList');
 
     const taskText = input.value;
-    
+
     if (taskText.trim() === '') return; // Ignore empty input
 
     const userId = firebaseApp.auth().currentUser.uid; // Get the current user's ID
     console.log(userId);
-    const taskRef = database.ref('tasks/' + userId).push(); // Create a new reference for the task
+
+    // Specify the list name you want to add the task to
+    const listName = "MyListName2"; // Replace this with the actual list name
+
+    // Create a new reference for the task under the specific user and list
+    const taskRef = database.ref(`users/${userId}/lists/${listName}/tasks`).push();
 
     // Save the task to Firebase
     taskRef.set({
-        task: taskText,
-        done: false
+        description: taskText,
+        done: false,
+        tagsAdded: [] // Initialize as empty; can add tags later
     }).then(() => {
-        console.log(taskText);
         // Create and display the new task in the UI after saving to Firebase
         const newTask = document.createElement('li');
         newTask.setAttribute('data-task-id', taskRef.key); // Store the task ID for later use
+
         newTask.innerHTML = `<div class="circle"></div>
                              <div class="task-input task-text" contenteditable="true">${taskText}</div>
                              <img src="./img/tag.png" class="tag-button" />
@@ -442,27 +448,6 @@ function toggleDropdown() {
     dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
 }
 
-$(document).ready(function() {
-    // Retrieve user info from sessionStorage
-    const username = sessionStorage.getItem('username');
-    const userInitial = sessionStorage.getItem('userInitial');
-    const email = sessionStorage.getItem('userEmail');
-
-    console.log(username, userInitial, email);
-
-    // Check if username exists, then update the UI
-    if (username) {
-        document.querySelector('.username').textContent = `Welcome, ${username}`;
-        document.querySelector('.user-circle').textContent = userInitial;
-    }
-
-    if (email) {
-        document.querySelector('.user-email').textContent = email;
-    }
-
-    // Call the function on page load to ensure layout is correct
-    handleResize();
-});
 
 window.onclick = function(event) {
     const userDropdown = document.getElementById("userDropdown");
@@ -526,3 +511,140 @@ document.getElementById('delete-option').addEventListener('click', function() {
         contextMenu.style.display = 'none'; // Hide the context menu
     }
 });
+
+
+
+
+// Firebase Database Functions!!!
+$(document).ready(function() {
+    auth.onAuthStateChanged((user) => {
+        if (user) {
+            initializeUser(user.uid); // Initialize user data
+        } else {
+            window.location.href = 'index.html'; // Redirect to login
+        }
+    });
+
+    handleResize(); // Call the function on page load to ensure layout is correct
+});
+
+// Function to initialize user data
+function initializeUser(userId) {
+    const userRef = database.ref(`users/${userId}`);
+
+    userRef.once('value').then((snapshot) => {
+        const userData = snapshot.val();
+        if (userData) {
+            displayUserInfo(userData); // Display user information
+            loadUserLists(userId); // Load user's lists
+        }
+    }).catch((error) => {
+        console.error('Error fetching user data:', error);
+    });
+}
+
+// Function to display user info
+function displayUserInfo(userData) {
+    document.querySelector('.username').textContent = `Welcome, ${userData.displayName}`;
+    document.querySelector('.user-circle').textContent = userData.displayName.charAt(0);
+    document.querySelector('.user-email').textContent = userData.email;
+}
+
+// Function to load user's lists
+function loadUserLists(userId) {
+    const listsRef = database.ref(`users/${userId}/lists`);
+    listsRef.once('value').then((listsSnapshot) => {
+        const listsContainer = document.getElementById('lists');
+        listsContainer.innerHTML = '<h2>My Lists<img src="./img/add.png" class="add-list" alt="Add"/></h2>'; // Clear previous lists
+
+        let firstListName = null; // To store the first list name
+        
+        listsSnapshot.forEach((listSnapshot) => {
+            const listName = listSnapshot.key; // Get the list name
+
+            // Append list items to the side navbar
+            const listItem = document.createElement('div');
+            listItem.classList.add('list-item');
+            listItem.innerHTML = `<a href="#" class="list-link">${listName}</a>`;
+            listsContainer.appendChild(listItem);
+
+            // Store the first list name
+            if (!firstListName) {
+                firstListName = listName; // Store the first list name for later use
+            }
+        });
+
+        // If there are lists, display the tasks for the first list
+        if (firstListName) {
+            displayTasksForList(userId, firstListName);
+            document.getElementById('list-title').textContent = firstListName; // Set the title
+
+            // Set the selected class for the first list link
+            const firstListLink = listsContainer.querySelector('.list-link');
+            if (firstListLink) {
+                firstListLink.classList.add('selected-list'); // Add the selected class to the first list link
+            }
+        }
+
+        // Add event listeners for list links
+        addListClickEvent(userId);
+    }).catch((error) => {
+        console.error('Error fetching lists:', error);
+    });
+}
+
+// Function to append a list item to the lists container
+function appendListItem(listsContainer, listName) {
+    const listItem = document.createElement('div');
+    listItem.classList.add('list-item');
+    listItem.innerHTML = `<a href="#" class="list-link">${listName}</a>`;
+    listsContainer.appendChild(listItem);
+}
+
+// Function to add click event listener for list links
+function addListClickEvent(userId) {
+    $(document).on('click', '.list-link', function(event) {
+        event.preventDefault();
+        
+        // Remove the 'selected-list' class from all list items
+        $('.list-link').removeClass('selected-list');
+        // Add the 'selected-list' class to the clicked link
+        $(this).addClass('selected-list');
+
+        const selectedListName = $(this).text(); // Get the list name from the clicked item
+        displayTasksForList(userId, selectedListName); // Fetch and display tasks for the selected list
+        document.getElementById('list-title').textContent = selectedListName; // Update the title
+    });
+}
+
+// Function to display tasks for a specific list
+function displayTasksForList(userId, listName) {
+    const tasksRef = database.ref(`users/${userId}/lists/${listName}/tasks`);
+
+    tasksRef.once('value').then((tasksSnapshot) => {
+        const taskList = document.getElementById('taskList'); // Get the task list element
+        taskList.innerHTML = ''; // Clear existing tasks
+
+        tasksSnapshot.forEach((taskSnapshot) => {
+            const task = taskSnapshot.val();
+            const taskId = taskSnapshot.key; // Get task ID
+            appendTaskItem(taskList, taskId, task.description); // Append task item
+        });
+    }).catch((error) => {
+        console.error('Error fetching tasks:', error);
+    });
+}
+
+// Function to append a task item to the task list
+function appendTaskItem(taskList, taskId, description) {
+    const newTask = document.createElement('li');
+    newTask.setAttribute('data-task-id', taskId); // Store the task ID
+    newTask.innerHTML = `
+        <div class="circle"></div>
+        <div class="task-input task-text" contenteditable="true">${description}</div>
+        <img src="./img/tag.png" class="tag-button" />
+        <div class="tag-dropdown"></div>
+        <img src="./img/delete.png" class="delete-button" alt="Delete"/>
+    `;
+    taskList.appendChild(newTask);
+}
