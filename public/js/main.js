@@ -122,10 +122,10 @@ function toggleLightDarkMode() {
 
 
 
-// Task List Functions
+// Task CRUD Functions
 
 $('#taskList').on('click', '.circle', function(event) {
-    taskCompleted(event);
+    updateTaskCompleted(event);
 });
 
 $('#taskList').on('click', '.tag-button', function(event) {
@@ -133,7 +133,7 @@ $('#taskList').on('click', '.tag-button', function(event) {
 });
 
 $('#taskList').on('blur', '.task-input.task-text', function(event) {
-    updateTask(event);
+    updateTaskText(event);
 });
 
 $('#taskList').on('click', '.delete-button', function(event) {
@@ -175,41 +175,28 @@ function addTask() {
 }
 
 
-
-function updateTask(event) {
-    console.log("TODO: update code coming soon");
-}
-
-
-function deleteTask(event) {
-    const listItem = event.currentTarget.closest('li');
+function updateTaskText(event) {
+    const taskTextElement = event.currentTarget;
+    const listItem = taskTextElement.closest('li');
     const taskId = listItem.getAttribute('data-task-id'); // Get the task ID from the data attribute
 
-    // Create a reference to the task in the database
+    const newTaskText = taskTextElement.textContent.trim(); // Get the updated task text
+
+    // Create a reference to the task in the Firebase database
     const taskRef = database.ref(`users/${currentUserId}/lists/${currentListId}/tasks/${taskId}`);
 
-    // Remove the task from the Firebase database
-    taskRef.remove()
-        .then(() => {
-            // If the task was successfully removed from Firebase, fade it out from the UI
-            listItem.style.transition = 'opacity 0.5s ease'; // Add a transition for smooth removal
-            listItem.style.opacity = '0'; // Fade out
-
-            // Remove the item after the fade-out transition
-            setTimeout(() => {
-                listItem.remove();
-            }, 500); // Match the duration with the CSS transition
-        })
-        .catch((error) => {
-            console.error('Error removing task:', error);
-        });
+    // Update the task description in Firebase
+    taskRef.update({
+        description: newTaskText
+    }).then(() => {
+        console.log('Task updated in the database.');
+    }).catch((error) => {
+        console.error('Error updating task:', error);
+    });
 }
 
 
-
-
-
-function taskCompleted(event) {
+function updateTaskCompleted(event) {
     const listItem = event.currentTarget.closest('li');
     listItem.classList.toggle('completed'); // Toggle the completed class
 
@@ -229,6 +216,22 @@ function taskCompleted(event) {
     if (listItem.classList.contains('completed')) {
         createConfetti();
     }
+
+    // Get the task ID from the data attribute
+    const taskId = listItem.getAttribute('data-task-id');
+
+    // Create a reference to the task in the database
+    const taskRef = database.ref(`users/${currentUserId}/lists/${currentListId}/tasks/${taskId}`);
+
+    // Update the "done" field in Firebase
+    const isCompleted = listItem.classList.contains('completed');
+    taskRef.update({ done: isCompleted })
+        .then(() => {
+            console.log(`Task ${isCompleted ? 'completed' : 'not completed'} in the database.`);
+        })
+        .catch((error) => {
+            console.error('Error updating task completed status:', error);
+        });
 }
 
 
@@ -273,6 +276,32 @@ function createConfetti() {
         });
     }
 }
+
+
+function deleteTask(event) {
+    const listItem = event.currentTarget.closest('li');
+    const taskId = listItem.getAttribute('data-task-id'); // Get the task ID from the data attribute
+
+    // Create a reference to the task in the database
+    const taskRef = database.ref(`users/${currentUserId}/lists/${currentListId}/tasks/${taskId}`);
+
+    // Remove the task from the Firebase database
+    taskRef.remove()
+        .then(() => {
+            // If the task was successfully removed from Firebase, fade it out from the UI
+            listItem.style.transition = 'opacity 0.5s ease'; // Add a transition for smooth removal
+            listItem.style.opacity = '0'; // Fade out
+
+            // Remove the item after the fade-out transition
+            setTimeout(() => {
+                listItem.remove();
+            }, 500); // Match the duration with the CSS transition
+        })
+        .catch((error) => {
+            console.error('Error removing task:', error);
+        });
+}
+
 
 
 
@@ -730,7 +759,7 @@ function displayTasksForList(userId, listId) {
         tasksSnapshot.forEach((taskSnapshot) => {
             const task = taskSnapshot.val();
             const taskId = taskSnapshot.key; // Get task ID
-            appendTaskItem(taskList, taskId, task.description); // Append task item
+            appendTaskItem(taskList, taskId, task.description, task.done); // Append task item
         });
     }).catch((error) => {
         console.error('Error fetching tasks:', error);
@@ -738,9 +767,15 @@ function displayTasksForList(userId, listId) {
 }
 
 // Function to append a task item to the task list
-function appendTaskItem(taskList, taskId, description) {
+function appendTaskItem(taskList, taskId, description, isDone) {
     const newTask = document.createElement('li');
     newTask.setAttribute('data-task-id', taskId); // Store the task ID
+    
+    // Add the completed class if the task is done
+    if (isDone) {
+        newTask.classList.add('completed'); // Add completed class for completed tasks
+    }
+
     newTask.innerHTML = `
         <div class="circle"></div>
         <div class="task-input task-text" contenteditable="true">${description}</div>
