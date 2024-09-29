@@ -563,10 +563,7 @@ function loadUserLists(userId) {
             const listName = listSnapshot.key; // Get the list name
 
             // Append list items to the side navbar
-            const listItem = document.createElement('div');
-            listItem.classList.add('list-item');
-            listItem.innerHTML = `<a href="#" class="list-link">${listName}</a>`;
-            listsContainer.appendChild(listItem);
+            appendListItem(listsContainer, listName);
 
             // Store the first list name
             if (!firstListName) {
