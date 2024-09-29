@@ -1,5 +1,9 @@
 import { firebaseApp, auth, database } from './firebase-auth.js';
 
+let currentListName = '';
+let currentListId = '';
+let currentUserId = '';
+
 // Document ready function
 $(function () {
     // Update tag color as soon as it is changed in the color picker
@@ -140,25 +144,18 @@ $('#addButton').on('click', addTask);
 function addTask() {
     const input = document.getElementById('newTaskInput');
     const taskList = document.getElementById('taskList');
-
     const taskText = input.value;
 
     if (taskText.trim() === '') return; // Ignore empty input
 
-    const userId = firebaseApp.auth().currentUser.uid; // Get the current user's ID
-    console.log(userId);
-
-    // Specify the list name you want to add the task to
-    const listName = "MyListName2"; // Replace this with the actual list name
-
+    console.log('Adding task:', taskText, currentListId, currentListName, currentUserId);
     // Create a new reference for the task under the specific user and list
-    const taskRef = database.ref(`users/${userId}/lists/${listName}/tasks`).push();
+    const taskRef = database.ref(`users/${currentUserId}/lists/${currentListId}/tasks`).push();
 
-    // Save the task to Firebase
+    // Save the task to Firebase under the taskId
     taskRef.set({
         description: taskText,
-        done: false,
-        tagsAdded: [] // Initialize as empty; can add tags later
+        done: false
     }).then(() => {
         // Create and display the new task in the UI after saving to Firebase
         const newTask = document.createElement('li');
@@ -178,6 +175,7 @@ function addTask() {
 }
 
 
+
 function updateTask(event) {
     console.log("TODO: update code coming soon");
 }
@@ -185,14 +183,29 @@ function updateTask(event) {
 
 function deleteTask(event) {
     const listItem = event.currentTarget.closest('li');
-    listItem.style.transition = 'opacity 0.5s ease'; // Add a transition for smooth removal
-    listItem.style.opacity = '0'; // Fade out
+    const taskId = listItem.getAttribute('data-task-id'); // Get the task ID from the data attribute
 
-    // Remove the item after the fade-out transition
-    setTimeout(() => {
-        listItem.remove();
-    }, 500); // Match the duration with the CSS transition
+    // Create a reference to the task in the database
+    const taskRef = database.ref(`users/${currentUserId}/lists/${currentListId}/tasks/${taskId}`);
+
+    // Remove the task from the Firebase database
+    taskRef.remove()
+        .then(() => {
+            // If the task was successfully removed from Firebase, fade it out from the UI
+            listItem.style.transition = 'opacity 0.5s ease'; // Add a transition for smooth removal
+            listItem.style.opacity = '0'; // Fade out
+
+            // Remove the item after the fade-out transition
+            setTimeout(() => {
+                listItem.remove();
+            }, 500); // Match the duration with the CSS transition
+        })
+        .catch((error) => {
+            console.error('Error removing task:', error);
+        });
 }
+
+
 
 
 
@@ -267,21 +280,52 @@ function createConfetti() {
 
 $(".add-list").click(addNewList);
 function addNewList() {
+    console.log("ADDING LIST");
     const listName = prompt("Enter the name of your new list:");
 
+    // Validate that the list name is not empty or whitespace
     if (listName && listName.trim() !== '') {
-        const lists = document.getElementById('lists');
+        // Generate a unique ID for the new list (Firebase will handle this automatically)
+        const listsRef = database.ref(`users/${currentUserId}/lists`); // Reference to user's lists
+        const newListRef = listsRef.push(); // Create a new list under the current user
 
-        const newList = document.createElement('a');
-        newList.href = "#"; // Set link as needed
-        newList.textContent = listName; // Set the name of the list
-        newList.className = ''; // Add any necessary classes
+        // Prepare the list data
+        const newListData = {
+            listName: listName, // Set the list name
+            tasks: {} // Initialize an empty tasks object for this list
+        };
 
-        lists.appendChild(newList); // Append to the sidebar
+        // Save the new list data in Firebase
+        newListRef.set(newListData).then(() => {
+            // On success, add the new list to the sidebar
+            const lists = document.getElementById('list-items'); // Assuming 'list-items' is the container
+
+            const newList = document.createElement('div');
+            newList.innerHTML = `<a href="#" class="list-link" data-list-id="${newListRef.key}">${listName}</a>`;
+            lists.appendChild(newList); // Append to the sidebar
+
+            // Automatically select and load the new list
+            currentListName = listName;
+            currentListId = newListRef.key;
+
+            // Update the list title at the top
+            document.getElementById('list-title').textContent = listName;
+
+            // Remove 'selected-list' class from other lists and add it to the new one
+            $('.list-link').removeClass('selected-list'); // Remove class from other list links
+            newList.querySelector('.list-link').classList.add('selected-list'); // Add class to the new list link
+
+            // Display tasks for the new list (empty initially)
+            displayTasksForList(currentUserId, newListRef.key);
+        }).catch((error) => {
+            console.error('Error adding new list to Firebase:', error);
+            alert("There was an error adding your list. Please try again.");
+        });
     } else {
         alert("List name cannot be empty.");
     }
 }
+
 
 
 $("#list-title").on('blur', updateListTitle);
@@ -519,6 +563,7 @@ document.getElementById('delete-option').addEventListener('click', function() {
 $(document).ready(function() {
     auth.onAuthStateChanged((user) => {
         if (user) {
+            currentUserId = user.uid; // Store the current user ID
             initializeUser(user.uid); // Initialize user data
         } else {
             window.location.href = 'index.html'; // Redirect to login
@@ -554,32 +599,38 @@ function displayUserInfo(userData) {
 function loadUserLists(userId) {
     const listsRef = database.ref(`users/${userId}/lists`);
     listsRef.once('value').then((listsSnapshot) => {
-        const listsContainer = document.getElementById('lists');
-        listsContainer.innerHTML = '<h2>My Lists<img src="./img/add.png" class="add-list" alt="Add"/></h2>'; // Clear previous lists
+        const listsContainer = document.getElementById('list-items');
+        listsContainer.innerHTML = ''; // Clear previous lists
 
-        let firstListName = null; // To store the first list name
+        let firstListId = null; // To store the first listId
         
         listsSnapshot.forEach((listSnapshot) => {
-            const listName = listSnapshot.key; // Get the list name
+            const listId = listSnapshot.key; // Get the listId
+            const listData = listSnapshot.val(); // Get the list data (which contains listName)
+
+            const listName = listData.listName; // Get the list name from the data
 
             // Append list items to the side navbar
-            appendListItem(listsContainer, listName);
+            appendListItem(listsContainer, listId, listName);
 
-            // Store the first list name
-            if (!firstListName) {
-                firstListName = listName; // Store the first list name for later use
+            // Store the first listId
+            if (!firstListId) {
+                firstListId = listId; // Store the first listId for later use
             }
         });
 
         // If there are lists, display the tasks for the first list
-        if (firstListName) {
-            displayTasksForList(userId, firstListName);
-            document.getElementById('list-title').textContent = firstListName; // Set the title
+        if (firstListId) {
+            displayTasksForList(userId, firstListId);
+            const firstList = listsSnapshot.child(firstListId).val();
+            document.getElementById('list-title').textContent = firstList.listName; // Set the title
 
             // Set the selected class for the first list link
             const firstListLink = listsContainer.querySelector('.list-link');
             if (firstListLink) {
                 firstListLink.classList.add('selected-list'); // Add the selected class to the first list link
+                currentListId = firstListId; // Store currentListId
+                currentListName = firstListLink.textContent; // Store currentListName
             }
         }
 
@@ -591,10 +642,10 @@ function loadUserLists(userId) {
 }
 
 // Function to append a list item to the lists container
-function appendListItem(listsContainer, listName) {
+function appendListItem(listsContainer, listId, listName) {
     const listItem = document.createElement('div');
     listItem.classList.add('list-item');
-    listItem.innerHTML = `<a href="#" class="list-link">${listName}</a>`;
+    listItem.innerHTML = `<a href="#" class="list-link" data-list-id="${listId}">${listName}</a>`; // Store listId in the DOM
     listsContainer.appendChild(listItem);
 }
 
@@ -608,15 +659,19 @@ function addListClickEvent(userId) {
         // Add the 'selected-list' class to the clicked link
         $(this).addClass('selected-list');
 
+        const selectedListId = $(this).data('list-id'); // Get the listId from the clicked item
+        currentListId = selectedListId; // Update the currentListId
+
+        displayTasksForList(userId, selectedListId); // Fetch and display tasks for the selected list
+
         const selectedListName = $(this).text(); // Get the list name from the clicked item
-        displayTasksForList(userId, selectedListName); // Fetch and display tasks for the selected list
         document.getElementById('list-title').textContent = selectedListName; // Update the title
     });
 }
 
 // Function to display tasks for a specific list
-function displayTasksForList(userId, listName) {
-    const tasksRef = database.ref(`users/${userId}/lists/${listName}/tasks`);
+function displayTasksForList(userId, listId) {
+    const tasksRef = database.ref(`users/${userId}/lists/${listId}/tasks`);
 
     tasksRef.once('value').then((tasksSnapshot) => {
         const taskList = document.getElementById('taskList'); // Get the task list element
