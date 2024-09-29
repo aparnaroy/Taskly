@@ -120,8 +120,6 @@ function toggleLightDarkMode() {
 
 
 
-
-
 // Task CRUD Functions
 
 $('#taskList').on('click', '.circle', function(event) {
@@ -140,6 +138,7 @@ $('#taskList').on('click', '.delete-button', function(event) {
     deleteTask(event);
 });
 
+// TASK CREATE
 $('#addButton').on('click', addTask);
 function addTask() {
     const input = document.getElementById('newTaskInput');
@@ -175,6 +174,7 @@ function addTask() {
 }
 
 
+// TASK UPDATE Text
 function updateTaskText(event) {
     const taskTextElement = event.currentTarget;
     const listItem = taskTextElement.closest('li');
@@ -195,7 +195,7 @@ function updateTaskText(event) {
     });
 }
 
-
+// TASK UPDATE Completion
 function updateTaskCompleted(event) {
     const listItem = event.currentTarget.closest('li');
     listItem.classList.toggle('completed'); // Toggle the completed class
@@ -278,6 +278,7 @@ function createConfetti() {
 }
 
 
+// TASK DESTROY
 function deleteTask(event) {
     const listItem = event.currentTarget.closest('li');
     const taskId = listItem.getAttribute('data-task-id'); // Get the task ID from the data attribute
@@ -304,9 +305,9 @@ function deleteTask(event) {
 
 
 
+// List CRUD Functions
 
-// List Functions
-
+// LIST CREATE
 $(".add-list").click(addNewList);
 function addNewList() {
     console.log("ADDING LIST");
@@ -358,7 +359,7 @@ function addNewList() {
 }
 
 
-
+// LIST UPDATE
 $("#list-title").on('blur', updateListTitle);
 function updateListTitle() {
     const newTitle = document.getElementById('list-title').textContent;
@@ -382,42 +383,55 @@ function updateListTitle() {
 
 
 
-// Tag Functions
+// Tag CRUD Functions
 
+// TAG CREATE
 $(".add-tag").click(addNewTag);
 function addNewTag() {
     const tagName = prompt("Enter the name of your new tag:");
 
     if (tagName && tagName.trim() !== '') {
-        // Create a new tag item element
+        const tagsRef = database.ref(`users/${currentUserId}/tags`);
+        
+        // Push a new tag to generate a unique key
+        const newTagRef = tagsRef.push(); // This generates a unique key for the new tag
+        const tagId = newTagRef.key; // Get the new unique key
+        
+        // Create the tag item using innerHTML
         const tagItem = document.createElement('div');
         tagItem.className = 'tag-item';
+        tagItem.setAttribute('data-tag-id', tagId); // Set the data-tag-id attribute
 
-        // Create the tag link
-        const tagLink = document.createElement('a');
-        tagLink.href = "#";
-        tagLink.className = 'tag-name';
-        tagLink.textContent = tagName;
-
-        // Create the color picker
-        const colorPicker = document.createElement('input');
-        colorPicker.type = 'color';
-        colorPicker.className = 'color-picker';
-        colorPicker.value = getRandomColor(); // Set random color
-        
-        // Append elements to the tag item
-        tagItem.appendChild(tagLink);
-        tagItem.appendChild(colorPicker);
+        const tagColor = getRandomColor(); // Generate a random color
+        tagItem.innerHTML = `
+            <a href="#" class="tag-name">${tagName}</a>
+            <input type="color" class="color-picker" value="${tagColor}" />
+        `;
 
         // Append the new tag item to the tags div
         document.getElementById('tags').appendChild(tagItem);
-        
+
+        console.log(tagItem);
+
         // Add event listener to the color picker
+        const colorPicker = tagItem.querySelector('.color-picker');
         colorPicker.addEventListener('input', updateTagColor);
+
+        // Save the new tag to the database
+        newTagRef.set({
+            tagName: tagName,
+            tagColor: tagColor
+        }).then(() => {
+            console.log('New tag added to the database successfully.');
+        }).catch((error) => {
+            console.error('Error adding new tag to the database:', error);
+        });
+        
     } else {
         alert("Tag name cannot be empty.");
     }
 }
+
 
 // Function to generate a random color
 function getRandomColor() {
@@ -429,13 +443,12 @@ function getRandomColor() {
     return color;
 }
 
-// Function to get the tags from the side navbar
+// Function to get the tags from the side navbar for tag dropdown
 function getTags() {
     const tagElements = document.querySelectorAll('#tags a');
     return Array.from(tagElements).map(tag => tag.textContent);
 }
 
-// TODO: Hide tag dropdown when clicking elsewhere
 // Function to toggle the visibility of the tag dropdown
 function toggleTagDropdown(event) {
     const dropdown = event.target.nextElementSibling; // Find the corresponding dropdown div
@@ -457,6 +470,29 @@ function toggleTagDropdown(event) {
     dropdown.classList.toggle('visible');
 }
 
+
+// TAG UPDATE
+function updateTagColor(event) {
+    const colorPicker = event.target;
+    const selectedColor = colorPicker.value;
+    
+    // Get the tag name corresponding to the color picker
+    const tagName = colorPicker.closest('.tag-item').querySelector('.tag-name').textContent;
+    
+    // Find all list items that contain the tag
+    const listItems = document.querySelectorAll('#taskList li');
+    listItems.forEach(listItem => {
+        const existingTag = Array.from(listItem.querySelectorAll('.tag-rectangle'))
+            .find(tag => tag.textContent === tagName);
+        
+        if (existingTag) {
+            existingTag.style.backgroundColor = selectedColor; // Update the tag color
+        }
+    });
+}
+
+
+// TASK UPDATE Tag
 function addTagToTask(event, tagText) {
     event.preventDefault(); // Prevent the default link behavior
 
@@ -506,25 +542,6 @@ function addTagToTask(event, tagText) {
     if (dropdown) {
         dropdown.classList.remove('visible');
     }
-}
-
-function updateTagColor(event) {
-    const colorPicker = event.target;
-    const selectedColor = colorPicker.value;
-    
-    // Get the tag name corresponding to the color picker
-    const tagName = colorPicker.closest('.tag-item').querySelector('.tag-name').textContent;
-    
-    // Find all list items that contain the tag
-    const listItems = document.querySelectorAll('#taskList li');
-    listItems.forEach(listItem => {
-        const existingTag = Array.from(listItem.querySelectorAll('.tag-rectangle'))
-            .find(tag => tag.textContent === tagName);
-        
-        if (existingTag) {
-            existingTag.style.backgroundColor = selectedColor; // Update the tag color
-        }
-    });
 }
 
 
@@ -589,7 +606,8 @@ document.addEventListener('click', function() {
     contextMenu.style.display = 'none';
 });
 
-// Deleting Lists and Tags
+
+// LIST & TAG DELETE
 $('#delete-option').on('click', deleteItemOrTag)
 function deleteItemOrTag() { 
     if (targetElement) {
