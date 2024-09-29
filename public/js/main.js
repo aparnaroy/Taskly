@@ -1,6 +1,6 @@
 import { firebaseApp, auth, database } from './firebase-auth.js';
 
-let currentListName = '';
+// let currentListName = '';
 let currentListId = '';
 let currentUserId = '';
 
@@ -148,7 +148,7 @@ function addTask() {
 
     if (taskText.trim() === '') return; // Ignore empty input
 
-    console.log('Adding task:', taskText, currentListId, currentListName, currentUserId);
+    // console.log('Adding task:', taskText, currentListId, currentListName, currentUserId);
     // Create a new reference for the task under the specific user and list
     const taskRef = database.ref(`users/${currentUserId}/lists/${currentListId}/tasks`).push();
 
@@ -301,11 +301,13 @@ function addNewList() {
             const lists = document.getElementById('list-items'); // Assuming 'list-items' is the container
 
             const newList = document.createElement('div');
+            newList.classList.add('list-item');
             newList.innerHTML = `<a href="#" class="list-link" data-list-id="${newListRef.key}">${listName}</a>`;
             lists.appendChild(newList); // Append to the sidebar
+            console.log(newList)
 
             // Automatically select and load the new list
-            currentListName = listName;
+            // currentListName = listName;
             currentListId = newListRef.key;
 
             // Update the list title at the top
@@ -331,9 +333,22 @@ function addNewList() {
 $("#list-title").on('blur', updateListTitle);
 function updateListTitle() {
     const newTitle = document.getElementById('list-title').textContent;
-    const navbarTitle = document.querySelector('#lists a'); // Update the correct selector based on your HTML structure
 
-    navbarTitle.textContent = newTitle; // Update the navbar title
+    if (newTitle && newTitle.trim() !== '') {
+        // Update the list title in the database (Firebase)
+        const listRef = database.ref(`users/${currentUserId}/lists/${currentListId}`);
+        listRef.update({ listName: newTitle }).then(() => {
+
+            // Update the title in the navbar
+            const navbarTitle = document.querySelector(`#list-items a[data-list-id="${currentListId}"]`);
+            navbarTitle.textContent = newTitle;
+
+        }).catch((error) => {
+            console.error('Error updating list title in the database:', error);
+        });
+    } else {
+        alert("List title cannot be empty.");
+    }
 }
 
 
@@ -513,11 +528,12 @@ window.onclick = function(event) {
 
 // Context Menu for Right-Clicking on a list or tag item and deleting it
 
-// Select all list and tag items
-const listItems = document.querySelectorAll('.list-item');
 const tagItems = document.querySelectorAll('.tag-item');
 const contextMenu = document.getElementById('context-menu');
 let targetElement = null; // To store which element is right-clicked
+
+// Add right-click listeners to tag items
+addRightClickListener(tagItems);
 
 // Function to add right-click event listener
 function addRightClickListener(items) {
@@ -527,6 +543,7 @@ function addRightClickListener(items) {
 
             // Store the right-clicked element (list-item or tag-item)
             targetElement = event.target.closest('.list-item, .tag-item');
+            console.log("Adding right-click listener", targetElement);
 
             let x = event.pageX + 10;
             let y = event.pageY + 10;
@@ -538,23 +555,50 @@ function addRightClickListener(items) {
     });
 }
 
-// Add right-click listeners to list and tag items
-addRightClickListener(listItems);
-addRightClickListener(tagItems);
-
 // Hide context menu on clicking elsewhere
 document.addEventListener('click', function() {
     contextMenu.style.display = 'none';
 });
 
-// Handle delete option click
-document.getElementById('delete-option').addEventListener('click', function() {
+// Deleting Lists and Tags
+$('#delete-option').on('click', deleteItemOrTag)
+function deleteItemOrTag() { 
     if (targetElement) {
-        targetElement.remove(); // Delete the right-clicked list-item or tag-item
-        targetElement = null;   // Clear the reference
-        contextMenu.style.display = 'none'; // Hide the context menu
+        // If it's a List item
+        if (targetElement.classList.contains('list-item')) {
+            // Find the child <a> tag inside the .list-item to get the data-list-id
+            const listLink = targetElement.querySelector('.list-link');
+            const listId = listLink.getAttribute('data-list-id');
+
+            // Remove the list from the Firebase database
+            const listRef = database.ref(`users/${currentUserId}/lists/${listId}`);
+            targetElement.remove(); // Remove the list from the DOM
+            listRef.remove().then(() => {
+                console.log('List removed from the database.');
+            }).catch((error) => {
+                console.error('Error removing list:', error);
+            });
+        
+        // If it's a Tag item
+        } else if (targetElement.classList.contains('tag-item')) {
+            const tagId = targetElement.getAttribute('data-tag-id'); // Get the tag ID
+
+            // Remove the tag from the Firebase database
+            const tagRef = database.ref(`users/${currentUserId}/tags/${tagId}`);
+            targetElement.remove(); // Remove the tag from the DOM
+            tagRef.remove().then(() => {
+                console.log('Tag removed from the database.');
+            }).catch((error) => {
+                console.error('Error removing tag:', error);
+            });
+        }
+
+        // Clear the reference and hide the context menu
+        targetElement = null;
+        contextMenu.style.display = 'none';
     }
-});
+}
+
 
 
 
@@ -630,12 +674,18 @@ function loadUserLists(userId) {
             if (firstListLink) {
                 firstListLink.classList.add('selected-list'); // Add the selected class to the first list link
                 currentListId = firstListId; // Store currentListId
-                currentListName = firstListLink.textContent; // Store currentListName
+                // currentListName = firstListLink.textContent; // Store currentListName
             }
         }
 
         // Add event listeners for list links
         addListClickEvent(userId);
+
+        // Add right-click listeners after the lists are loaded
+        const listItems = document.querySelectorAll('.list-item');
+        console.log("ListItems", listItems);
+        addRightClickListener(listItems);
+
     }).catch((error) => {
         console.error('Error fetching lists:', error);
     });
