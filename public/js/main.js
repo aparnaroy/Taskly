@@ -386,8 +386,9 @@ function updateListTitle() {
 // Tag CRUD Functions
 
 // TAG CREATE
-$(".add-tag").click(addNewTag);
+$(document).on('click', '.add-tag', addNewTag);
 function addNewTag() {
+    console.log("ADDING TAG");
     const tagName = prompt("Enter the name of your new tag:");
 
     if (tagName && tagName.trim() !== '') {
@@ -476,8 +477,12 @@ function updateTagColor(event) {
     const colorPicker = event.target;
     const selectedColor = colorPicker.value;
     
+    // Get the tag element and its ID
+    const tagItem = colorPicker.closest('.tag-item');
+    const tagId = tagItem.getAttribute('data-tag-id'); // Get the tag ID from the data attribute
+    
     // Get the tag name corresponding to the color picker
-    const tagName = colorPicker.closest('.tag-item').querySelector('.tag-name').textContent;
+    const tagName = tagItem.querySelector('.tag-name').textContent;
     
     // Find all list items that contain the tag
     const listItems = document.querySelectorAll('#taskList li');
@@ -488,6 +493,16 @@ function updateTagColor(event) {
         if (existingTag) {
             existingTag.style.backgroundColor = selectedColor; // Update the tag color
         }
+    });
+    
+    // Update the tag color in the database
+    const tagRef = database.ref(`users/${currentUserId}/tags/${tagId}`);
+    tagRef.update({
+        tagColor: selectedColor
+    }).then(() => {
+        console.log(`Tag color updated successfully for ${tagName} in the database.`);
+    }).catch((error) => {
+        console.error('Error updating tag color in the database:', error);
     });
 }
 
@@ -574,12 +589,9 @@ window.onclick = function(event) {
 
 // Context Menu for Right-Clicking on a list or tag item and deleting it
 
-const tagItems = document.querySelectorAll('.tag-item');
 const contextMenu = document.getElementById('context-menu');
 let targetElement = null; // To store which element is right-clicked
 
-// Add right-click listeners to tag items
-addRightClickListener(tagItems);
 
 // Function to add right-click event listener
 function addRightClickListener(items) {
@@ -673,6 +685,7 @@ function initializeUser(userId) {
         if (userData) {
             displayUserInfo(userData); // Display user information
             loadUserLists(userId); // Load user's lists
+            loadUserTags(userId); // Load user's tags
         }
     }).catch((error) => {
         console.error('Error fetching user data:', error);
@@ -721,7 +734,6 @@ function loadUserLists(userId) {
             if (firstListLink) {
                 firstListLink.classList.add('selected-list'); // Add the selected class to the first list link
                 currentListId = firstListId; // Store currentListId
-                // currentListName = firstListLink.textContent; // Store currentListName
             }
         }
 
@@ -802,4 +814,60 @@ function appendTaskItem(taskList, taskId, description, isDone) {
         <img src="./img/delete.png" class="delete-button" alt="Delete"/>
     `;
     taskList.appendChild(newTask);
+}
+
+
+
+// Function to load user's tags
+function loadUserTags(userId) {
+    const tagsRef = database.ref(`users/${userId}/tags`);
+    
+    tagsRef.once('value').then((tagsSnapshot) => {
+        const tagsContainer = document.getElementById('tags');
+        tagsContainer.innerHTML = ''; // Clear previous tags
+
+        // Add a heading for tags
+        const tagsHeader = document.createElement('h2');
+        tagsHeader.innerHTML = `Tags <img src="./img/add.png" class="add-tag" alt="Add"/>`;
+        tagsContainer.appendChild(tagsHeader);
+
+        tagsSnapshot.forEach((tagSnapshot) => {
+            const tagId = tagSnapshot.key; // Get tagId
+            const tagData = tagSnapshot.val(); // Get tag data (tagName and tagColor)
+
+            const tagName = tagData.tagName; // Get tag name from the data
+            const tagColor = tagData.tagColor || '#808080'; // Get tag color, defaulting to gray
+
+            // Create and append the tag item to the tags div
+            appendTagItem(tagsContainer, tagId, tagName, tagColor);
+        });
+
+        // Add right-click listeners after the tags are loaded
+        const tagItems = document.querySelectorAll('.tag-item');
+        console.log("TagItems:", tagItems);
+        addRightClickListener(tagItems);
+
+    }).catch((error) => {
+        console.error('Error fetching tags:', error);
+    });
+}
+
+// Function to append a tag item to the tags container
+function appendTagItem(tagsContainer, tagId, tagName, tagColor) {
+    const tagItem = document.createElement('div');
+    tagItem.classList.add('tag-item');
+    tagItem.setAttribute('data-tag-id', tagId); // Set the tagId in the DOM
+
+    // Create inner HTML for the tag
+    tagItem.innerHTML = `
+        <a href="#" class="tag-name">${tagName}</a>
+        <input type="color" class="color-picker" value="${tagColor}" />
+    `;
+
+    // Append the tag item to the tags container
+    tagsContainer.appendChild(tagItem);
+
+    // Add event listener to the color picker
+    const colorPicker = tagItem.querySelector('.color-picker');
+    colorPicker.addEventListener('input', updateTagColor);
 }
