@@ -146,7 +146,6 @@ function addTask() {
 
     if (taskText.trim() === '') return; // Ignore empty input
 
-    // console.log('Adding task:', taskText, currentListId, currentListName, currentUserId);
     // Create a new reference for the task under the specific user and list
     const taskRef = database.ref(`users/${currentUserId}/lists/${currentListId}/tasks`).push();
 
@@ -328,7 +327,7 @@ function addNewList() {
         // Save the new list data in Firebase
         newListRef.set(newListData).then(() => {
             // On success, add the new list to the sidebar
-            const lists = document.getElementById('list-items'); // Assuming 'list-items' is the container
+            const lists = document.getElementById('list-items');
 
             const newList = document.createElement('div');
             newList.classList.add('list-item');
@@ -349,6 +348,10 @@ function addNewList() {
 
             // Display tasks for the new list (empty initially)
             displayTasksForList(currentUserId, newListRef.key);
+
+            // Add right-click listeners for all lists, including the new one
+            const listItems = document.querySelectorAll('.list-item');
+            addRightClickListener(listItems);
         }).catch((error) => {
             console.error('Error adding new list to Firebase:', error);
             alert("There was an error adding your list. Please try again.");
@@ -418,13 +421,16 @@ function addNewTag() {
         const colorPicker = tagItem.querySelector('.color-picker');
         colorPicker.addEventListener('input', updateTagColor);
 
+        // Add right-click listener to all tags, including the new one
+        const tagItems = document.querySelectorAll('.tag-item');
+        addRightClickListener(tagItems);
+
         // Save the new tag to the database
         newTagRef.set({
             tagName: tagName,
             tagColor: tagColor
         }).then(() => {
             console.log('New tag added to the database successfully.');
-            console.log(`Tag Created: ID = ${tagId}, Name = ${tagName}, Color = ${tagColor}`);
         }).catch((error) => {
             console.error('Error adding new tag to the database:', error);
         });
@@ -531,7 +537,7 @@ function addTagToTask(event, tagText) {
 
     // Find the closest list item (task) where the tag was clicked
     const listItem = event.target.closest('li');
-    const taskId = listItem.getAttribute('data-task-id'); // Assuming each task li has a data-task-id attribute
+    const taskId = listItem.getAttribute('data-task-id');
 
     // Firebase reference to the task in the database
     const taskRef = firebase.database().ref(`users/${currentUserId}/lists/${currentListId}/tasks/${taskId}`);
@@ -540,20 +546,15 @@ function addTagToTask(event, tagText) {
     const existingTag = Array.from(listItem.querySelectorAll('.tag-rectangle'))
         .find(tag => tag.textContent === tagText);
     
-    console.log("Existing Tag:", existingTag); // Log existing tag
-
     if (existingTag) {
         // If the tag exists, remove it from the task UI
         listItem.removeChild(existingTag);
-        console.log("Removing tag:", tagText); // Log removal action
 
         // Also remove the tag from the Firebase database
         taskRef.child('tagsAttached').once('value', (snapshot) => {
             const tags = snapshot.val() || []; // Get existing tags or initialize as empty array
-            console.log("Current Tags before removal:", tags);
             const tagIdToRemove = existingTag.getAttribute('data-tag-id'); // Get the tag ID to remove
             const updatedTags = tags.filter(tagId => tagId !== tagIdToRemove); // Remove the tag by ID
-            console.log("Updated Tags after removal:", updatedTags, tagIdToRemove);
 
             // Update the Firebase database with the new array of tags
             taskRef.update({ tagsAttached: updatedTags })
@@ -587,7 +588,7 @@ function addTagToTask(event, tagText) {
             tagElement.classList.add('dull');
         }
 
-        // Find the tag button element (adjust this selector as necessary)
+        // Find the tag button element 
         const tagButtonElement = listItem.querySelector('.tag-button');
 
         // Insert the tag element before the tag button element
@@ -653,7 +654,6 @@ function addRightClickListener(items) {
 
             // Store the right-clicked element (list-item or tag-item)
             targetElement = event.target.closest('.list-item, .tag-item');
-            console.log("Adding right-click listener", targetElement);
 
             let x = event.pageX + 10;
             let y = event.pageY + 10;
@@ -672,16 +672,14 @@ document.addEventListener('click', function() {
 
 
 // LIST DELETE + TAG DELETE
-$('#delete-option').on('click', deleteItemOrTag)
+$('#delete-option').on('click', deleteItemOrTag);
 function deleteItemOrTag() { 
     if (targetElement) {
         // If it's a List item
         if (targetElement.classList.contains('list-item')) {
-            // Find the child <a> tag inside the .list-item to get the data-list-id
             const listLink = targetElement.querySelector('.list-link');
             const listId = listLink.getAttribute('data-list-id');
 
-            // Remove the list from the Firebase database
             const listRef = database.ref(`users/${currentUserId}/lists/${listId}`);
             targetElement.remove(); // Remove the list from the DOM
             listRef.remove().then(() => {
@@ -692,14 +690,22 @@ function deleteItemOrTag() {
         
         // If it's a Tag item
         } else if (targetElement.classList.contains('tag-item')) {
-            const tagId = targetElement.getAttribute('data-tag-id'); // Get the tag ID
-
-            // Remove the tag from the Firebase database
+            const tagId = targetElement.getAttribute('data-tag-id');
             const tagRef = database.ref(`users/${currentUserId}/tags/${tagId}`);
-            targetElement.remove(); // Remove the tag from the DOM
-            
-            tagRef.remove().then(() => {
+
+            targetElement.remove();  // Remove the tag from the DOM
+
+            // Remove tag from all tasks and then remove the tag from the database
+            removeTagFromAllTasks(tagId).then(() => {
+                console.log('Tag removed from all tasks in the database.');
+
+                // Now remove the tag from the database
+                return tagRef.remove();
+            }).then(() => {
                 console.log('Tag removed from the database.');
+
+                // Update the UI for all tasks with this tag after database updates
+                updateUITagRemoval(tagId);
             }).catch((error) => {
                 console.error('Error removing tag:', error);
             });
@@ -709,6 +715,43 @@ function deleteItemOrTag() {
         targetElement = null;
         contextMenu.style.display = 'none';
     }
+}
+
+// Function to remove a tag from all tasks
+function removeTagFromAllTasks(tagId) {
+    const tasksRef = database.ref(`users/${currentUserId}/lists/${currentListId}/tasks`);
+
+    return tasksRef.once('value').then((tasksSnapshot) => {
+        const updates = {};
+
+        tasksSnapshot.forEach((taskSnapshot) => {
+            const task = taskSnapshot.val();
+            const taskId = taskSnapshot.key;
+
+            // Check if the task has the tag attached
+            if (task.tagsAttached && Array.isArray(task.tagsAttached) && task.tagsAttached.includes(tagId)) {
+                // Remove the tag from the task's tagsAttached array
+                const updatedTags = task.tagsAttached.filter(id => id !== tagId);
+                updates[`/${taskId}/tagsAttached`] = updatedTags; // Prepare the update for this task
+            }
+        });
+
+        // Apply all updates in one operation
+        return tasksRef.update(updates);
+    });
+}
+
+// Function to update the UI for tag removal
+function updateUITagRemoval(tagId) {
+    const taskListItems = document.querySelectorAll('#taskList li'); // Select all task list items
+    taskListItems.forEach(listItem => {
+        const tagElement = Array.from(listItem.querySelectorAll('.tag-rectangle'))
+            .find(tag => tag.getAttribute('data-tag-id') === tagId); // Find the tag in the task
+
+        if (tagElement) {
+            listItem.removeChild(tagElement); // Remove the tag from the task UI
+        }
+    });
 }
 
 
