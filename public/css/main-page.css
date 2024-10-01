@@ -7,7 +7,7 @@ body {
     justify-content: flex-start;
     align-items: flex-start;
     background: white;
-    font-family: 'Roboto', sans-serif;
+    font-family: Arial, Helvetica, sans-serif;
 }
 
 /* Centered container */
@@ -26,7 +26,7 @@ body {
     top: 0; /* Align to the top of the viewport */
     left: 0; /* Align to the left */
     right: 0; /* Extend to the right */
-    height: 80px; /* Adjust height as needed */
+    height: 80px;
     background-color: transparent; /* Start with a transparent background */
     box-shadow: none; /* No shadow initially */
     z-index: 1; /* Ensure it appears above other elements */
@@ -106,8 +106,8 @@ body {
 }
 
 .user-circle {
-    width: 40px; /* Adjust size as needed */
-    height: 40px; /* Adjust size as needed */
+    width: 40px;
+    height: 40px; 
     border-radius: 50%; /* Make it circular */
     background-color: #3498db; /* Change color as needed */
     color: white; /* Text color */
@@ -128,7 +128,7 @@ body {
 .user-dropdown {
     display: none; /* Hidden by default */
     position: absolute;
-    top: 80px; /* Adjust based on where you want the dropdown to appear */
+    top: 80px; 
     right: 30px;
     background-color: #fff;
     border: 1px solid #ccc;
@@ -207,7 +207,7 @@ body {
 }
 
 #tags .tag-item:last-child {
-    margin-bottom: 170px; /* Or adjust as needed */
+    margin-bottom: 170px;
 }
 
 .selected-list {
@@ -239,11 +239,20 @@ body {
 }
 
 
-
 /******************* Main Contents ********************/
 
-/* Styles for screens smaller than 768px (adjust the width as needed) */
-@media (max-width: 768px) {
+/* Styles for smaller screens smaller */
+@media (max-width: 1068px) {
+    .box {
+        padding-left: 30px !important;
+        padding-right: 30px !important;
+        width: calc(100% - 200px) !important;
+    }
+
+    #input-container {
+        width: calc(100% - 60px) !important;
+    }
+    
     .side-nav {
         width: 250px; /* Sidebar takes full width on small screens */
     }
@@ -255,6 +264,22 @@ body {
     /* Ensure main content stays centered and aligned properly */
     .main-content.left-align {
         align-items: center; /* Reset to center alignment */
+    }
+}
+
+@media (max-width: 668px) {
+    .tag-rectangle {
+        font-size: 0 !important;
+    }
+
+    .box {
+        padding-left: 20px !important;
+        padding-right: 20px !important;
+        width: calc(100% - 110px) !important;
+    }
+
+    #input-container {
+        width: calc(100% - 40px) !important;
     }
 }
 
@@ -308,7 +333,7 @@ body {
 
 /* Center the box by default */
 .box {
-    width: calc(100% - 535px); /* Adjust width as needed */
+    width: calc(100% - 535px);
     min-width: 300px;
     min-height: 400px;
     padding-top: 15px;
@@ -356,7 +381,8 @@ body {
 }
 
 #newTaskInput {
-    width: 63vw; /* Adjust as needed */
+    /* width: 63vw; */
+    width: calc(100% - 140px);
     padding: 22px;
     border: 1.5px solid #979797;
     outline: none;
@@ -480,7 +506,7 @@ body {
 .delete-button {
     padding: 6px;
     margin-left: 10px; /* Push the delete button to the right */
-    width: 15px; /* Adjust size as needed */
+    width: 15px;
     height: auto;
     cursor: pointer;
     transition: all 0.3s ease; /* Smooth transition for hover effect */
@@ -493,7 +519,7 @@ body {
 
 .tag-button {
     padding: 6px;
-    width: 15px; /* Adjust size as needed */
+    width: 15px;
     height: auto; /* Maintain aspect ratio */
     margin-left: auto; /* Push the button to the right */
     cursor: pointer; /* Change cursor on hover */
@@ -540,8 +566,9 @@ body {
 }
 
 .tag-rectangle {
+    display: inline-block;
     margin-left: auto;
-    padding: 5px 10px; /* Adjust padding as needed */
+    padding: 5px 10px;
     margin-right: 15px;
     border-radius: 5px; /* Rounded corners */
     color: rgb(255, 255, 255); /* Text color */
@@ -592,7 +619,7 @@ body {
 
 
 .add-list {
-    width: 16px; /* Adjust size as needed */
+    width: 16px;
     height: auto;
     cursor: pointer;
     margin-left: 80px; /* Push it to the right */
@@ -607,7 +634,7 @@ body {
 }
 
 .add-tag {
-    width: 16px; /* Adjust size as needed */
+    width: 16px;
     height: auto;
     cursor: pointer;
     margin-left: 120px; /* Push it to the right */
@@ -665,7 +692,7 @@ body {
     animation: fall 1s cubic-bezier(.4, 0, .8, 1) forwards; /* Smooth acceleration */
     /* Randomize size, colors, and starting positions */
     left: calc(50% - 5px); /* Center initially */
-    animation-duration: 1s; /* Adjust duration for a longer fall */
+    animation-duration: 1s;
 }
 
 /* Randomize the size */

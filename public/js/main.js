@@ -78,7 +78,7 @@ function handleResize() {
     }
     
     // If the screen is too small, untoggle the sidebar and reset alignment
-    if (window.innerWidth <= 768) {
+    if (window.innerWidth <= 1068) {
         sideNav.classList.remove('open'); // Ensure sidebar is hidden
         navbarContainer.classList.remove('open');
         mainContent.classList.remove('left-align'); // Ensure main content is centered
@@ -391,7 +391,6 @@ function updateListTitle() {
 // TAG CREATE
 $(document).on('click', '.add-tag', addNewTag);
 function addNewTag() {
-    console.log("ADDING TAG");
     const tagName = prompt("Enter the name of your new tag:");
 
     if (tagName && tagName.trim() !== '') {
@@ -553,8 +552,11 @@ function addTagToTask(event, tagText) {
         // Also remove the tag from the Firebase database
         taskRef.child('tagsAttached').once('value', (snapshot) => {
             const tags = snapshot.val() || []; // Get existing tags or initialize as empty array
+            console.log("Tags", tags);
             const tagIdToRemove = existingTag.getAttribute('data-tag-id'); // Get the tag ID to remove
+            console.log("TagId to Remove", tagIdToRemove);
             const updatedTags = tags.filter(tagId => tagId !== tagIdToRemove); // Remove the tag by ID
+            console.log("Updated Tags", updatedTags);
 
             // Update the Firebase database with the new array of tags
             taskRef.update({ tagsAttached: updatedTags })
