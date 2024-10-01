@@ -619,7 +619,7 @@ document.addEventListener('click', function() {
 });
 
 
-// LIST & TAG DELETE
+// LIST DELETE + TAG DELETE
 $('#delete-option').on('click', deleteItemOrTag)
 function deleteItemOrTag() { 
     if (targetElement) {
@@ -662,7 +662,7 @@ function deleteItemOrTag() {
 
 
 
-// Firebase Database Functions!!!
+// Firebase READ Database Functions!!!
 $(document).ready(function() {
     auth.onAuthStateChanged((user) => {
         if (user) {
