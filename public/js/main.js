@@ -1,6 +1,5 @@
 import { firebaseApp, auth, database } from './firebase-auth.js';
 
-// let currentListName = '';
 let currentListId = '';
 let currentUserId = '';
 
@@ -154,6 +153,7 @@ function addTask() {
     // Save the task to Firebase under the taskId
     taskRef.set({
         description: taskText,
+        tagsAttached: [],
         done: false
     }).then(() => {
         // Create and display the new task in the UI after saving to Firebase
@@ -424,6 +424,7 @@ function addNewTag() {
             tagColor: tagColor
         }).then(() => {
             console.log('New tag added to the database successfully.');
+            console.log(`Tag Created: ID = ${tagId}, Name = ${tagName}, Color = ${tagColor}`);
         }).catch((error) => {
             console.error('Error adding new tag to the database:', error);
         });
@@ -444,32 +445,47 @@ function getRandomColor() {
     return color;
 }
 
-// Function to get the tags from the side navbar for tag dropdown
-function getTags() {
-    const tagElements = document.querySelectorAll('#tags a');
-    return Array.from(tagElements).map(tag => tag.textContent);
+// Function to retrieve tags from the Firebase database
+function getTags(callback) {
+    const tagsRef = firebase.database().ref(`users/${currentUserId}/tags`);
+    
+    tagsRef.once('value', (snapshot) => {
+        const tags = [];
+        snapshot.forEach((childSnapshot) => {
+            const tag = childSnapshot.val();
+            tags.push({
+                tagId: childSnapshot.key, // Include the tag ID
+                tagName: tag.tagName,
+                tagColor: tag.tagColor,
+            });
+        });
+        callback(tags); // Call the callback with the fetched tags
+    });
 }
+
 
 // Function to toggle the visibility of the tag dropdown
 function toggleTagDropdown(event) {
     const dropdown = event.target.nextElementSibling; // Find the corresponding dropdown div
-    const tags = getTags(); // Fetch the tags from the side navbar
     
-    dropdown.innerHTML = ''; 
+    dropdown.innerHTML = ''; // Clear existing dropdown content
 
-    // Populate the dropdown if it hasn't been done yet
-    if (!dropdown.innerHTML) {
+    // Fetch tags asynchronously
+    getTags((tags) => {
+        // Populate the dropdown with tags once they are fetched
         tags.forEach(tag => {
             const tagOption = document.createElement('a');
-            tagOption.textContent = tag;
-            tagOption.onclick = () => addTagToTask(event, tagOption.textContent, tag); // Attach event handler for selecting a tag
+            tagOption.textContent = tag.tagName;
+            tagOption.onclick = (e) => addTagToTask(event, tag.tagName); // Attach event handler for selecting a tag
             dropdown.appendChild(tagOption);
         });
-    }
 
-    // Toggle visibility of the dropdown
-    dropdown.classList.toggle('visible');
+        // Toggle visibility of the dropdown
+        dropdown.classList.toggle('visible');
+    });
 }
+
+
 
 
 // TAG UPDATE
@@ -507,38 +523,64 @@ function updateTagColor(event) {
 }
 
 
+
+
 // TASK UPDATE Tag
 function addTagToTask(event, tagText) {
     event.preventDefault(); // Prevent the default link behavior
 
     // Find the closest list item (task) where the tag was clicked
     const listItem = event.target.closest('li');
-    
+    const taskId = listItem.getAttribute('data-task-id'); // Assuming each task li has a data-task-id attribute
+
+    // Firebase reference to the task in the database
+    const taskRef = firebase.database().ref(`users/${currentUserId}/lists/${currentListId}/tasks/${taskId}`);
+
     // Check if the tag already exists
     const existingTag = Array.from(listItem.querySelectorAll('.tag-rectangle'))
         .find(tag => tag.textContent === tagText);
     
+    console.log("Existing Tag:", existingTag); // Log existing tag
+
     if (existingTag) {
-        // If the tag exists and matches the clicked tag, remove it
+        // If the tag exists, remove it from the task UI
         listItem.removeChild(existingTag);
+        console.log("Removing tag:", tagText); // Log removal action
+
+        // Also remove the tag from the Firebase database
+        taskRef.child('tagsAttached').once('value', (snapshot) => {
+            const tags = snapshot.val() || []; // Get existing tags or initialize as empty array
+            console.log("Current Tags before removal:", tags);
+            const tagIdToRemove = existingTag.getAttribute('data-tag-id'); // Get the tag ID to remove
+            const updatedTags = tags.filter(tagId => tagId !== tagIdToRemove); // Remove the tag by ID
+            console.log("Updated Tags after removal:", updatedTags, tagIdToRemove);
+
+            // Update the Firebase database with the new array of tags
+            taskRef.update({ tagsAttached: updatedTags })
+                .then(() => console.log("Tag removed successfully from database"))
+                .catch(error => console.error("Error removing tag from database:", error));
+        });
     } else {
         // Get the corresponding color picker for the tag
         const tagElements = document.querySelectorAll('#tags .tag-item');
         let color = '#000000'; // Default color
+        let tagId = null; // Initialize tagId
 
         tagElements.forEach(tagItem => {
-            const tagName = tagItem.querySelector('.tag-name').textContent;
-            if (tagName === tagText) {
+            const currentTagName = tagItem.querySelector('.tag-name').textContent;
+            if (currentTagName === tagText) {
                 const colorPicker = tagItem.querySelector('.color-picker');
                 color = colorPicker.value; // Get the value from the color picker
+                tagId = tagItem.getAttribute('data-tag-id'); // Get the tag ID
             }
         });
 
-        // Create a new tag element
+        // Create a new tag element for the UI
         const tagElement = document.createElement('div');
         tagElement.className = 'tag-rectangle'; // Add a class for styling
         tagElement.style.backgroundColor = color; // Set the color from the color picker
         tagElement.textContent = tagText; // Set the tag text
+        tagElement.setAttribute('data-tag-id', tagId); // Set the data attribute for the tag ID
 
         // Check if the task is marked as completed and add dull class if needed
         if (listItem.classList.contains('completed')) {
@@ -550,6 +592,15 @@ function addTagToTask(event, tagText) {
 
         // Insert the tag element before the tag button element
         listItem.insertBefore(tagElement, tagButtonElement);
+
+        // Also add the tag ID to the Firebase database
+        taskRef.child('tagsAttached').once('value', (snapshot) => {
+            const tags = snapshot.val() || []; // Get existing tags or initialize as empty array
+            if (!tags.includes(tagId)) {
+                tags.push(tagId); // Add the tag ID if it doesn't already exist
+                taskRef.update({ tagsAttached: tags });
+            }
+        });
     }
     
     // Hide the dropdown after selecting a tag
@@ -558,6 +609,7 @@ function addTagToTask(event, tagText) {
         dropdown.classList.remove('visible');
     }
 }
+
 
 
 
@@ -645,6 +697,7 @@ function deleteItemOrTag() {
             // Remove the tag from the Firebase database
             const tagRef = database.ref(`users/${currentUserId}/tags/${tagId}`);
             targetElement.remove(); // Remove the tag from the DOM
+            
             tagRef.remove().then(() => {
                 console.log('Tag removed from the database.');
             }).catch((error) => {
@@ -742,7 +795,6 @@ function loadUserLists(userId) {
 
         // Add right-click listeners after the lists are loaded
         const listItems = document.querySelectorAll('.list-item');
-        console.log("ListItems", listItems);
         addRightClickListener(listItems);
 
     }).catch((error) => {
@@ -786,26 +838,31 @@ function displayTasksForList(userId, listId) {
         const taskList = document.getElementById('taskList'); // Get the task list element
         taskList.innerHTML = ''; // Clear existing tasks
 
-        tasksSnapshot.forEach((taskSnapshot) => {
-            const task = taskSnapshot.val();
-            const taskId = taskSnapshot.key; // Get task ID
-            appendTaskItem(taskList, taskId, task.description, task.done); // Append task item
+        // Load tags once and create a tagsMap
+        loadUserTags(userId).then(tagsMap => {
+            tasksSnapshot.forEach((taskSnapshot) => {
+                const task = taskSnapshot.val();
+                const taskId = taskSnapshot.key; // Get task ID
+                appendTaskItem(taskList, taskId, task.description, task.done, task.tagsAttached || [], tagsMap); // Pass tagsMap
+            });
         });
     }).catch((error) => {
         console.error('Error fetching tasks:', error);
     });
 }
 
+
 // Function to append a task item to the task list
-function appendTaskItem(taskList, taskId, description, isDone) {
+function appendTaskItem(taskList, taskId, description, isDone, tagsAttached, tagsMap) {
     const newTask = document.createElement('li');
     newTask.setAttribute('data-task-id', taskId); // Store the task ID
-    
+
     // Add the completed class if the task is done
     if (isDone) {
         newTask.classList.add('completed'); // Add completed class for completed tasks
     }
 
+    // Create the inner HTML for the task
     newTask.innerHTML = `
         <div class="circle"></div>
         <div class="task-input task-text" contenteditable="true">${description}</div>
@@ -813,16 +870,46 @@ function appendTaskItem(taskList, taskId, description, isDone) {
         <div class="tag-dropdown"></div>
         <img src="./img/delete.png" class="delete-button" alt="Delete"/>
     `;
+
+    const tagButtonElement = newTask.querySelector('.tag-button');
+
+    // Check if there are tags attached to the task
+    if (tagsAttached && tagsAttached.length > 0) { // Ensure it's an array and has items
+        tagsAttached.forEach(tagId => {
+            // Look up the tag information in tagsMap
+            const tagInfo = tagsMap[tagId]; // Get tag info from the map
+            if (tagInfo) {
+                const { tagName, tagColor } = tagInfo; // Destructure tagName and tagColor
+
+                // Create a new tag element
+                const tagElement = document.createElement('div');
+                tagElement.className = 'tag-rectangle'; // Add a class for styling
+                tagElement.style.backgroundColor = tagColor; // Set the color from the tag info
+                tagElement.textContent = tagName; // Set the tag name
+
+                // Check if the task is marked as completed and add dull class if needed
+                if (newTask.classList.contains('completed')) {
+                    tagElement.classList.add('dull');
+                }
+
+                // Add the tag element to the task
+                newTask.insertBefore(tagElement, tagButtonElement);
+            }
+        });
+    }
+
     taskList.appendChild(newTask);
 }
+
+
 
 
 
 // Function to load user's tags
 function loadUserTags(userId) {
     const tagsRef = database.ref(`users/${userId}/tags`);
-    
-    tagsRef.once('value').then((tagsSnapshot) => {
+
+    return tagsRef.once('value').then((tagsSnapshot) => { // Return the promise
         const tagsContainer = document.getElementById('tags');
         tagsContainer.innerHTML = ''; // Clear previous tags
 
@@ -831,6 +918,8 @@ function loadUserTags(userId) {
         tagsHeader.innerHTML = `Tags <img src="./img/add.png" class="add-tag" alt="Add"/>`;
         tagsContainer.appendChild(tagsHeader);
 
+        const tagsMap = {}; // Create a map to store tagId, tagName, and tagColor
+
         tagsSnapshot.forEach((tagSnapshot) => {
             const tagId = tagSnapshot.key; // Get tagId
             const tagData = tagSnapshot.val(); // Get tag data (tagName and tagColor)
@@ -838,19 +927,26 @@ function loadUserTags(userId) {
             const tagName = tagData.tagName; // Get tag name from the data
             const tagColor = tagData.tagColor || '#808080'; // Get tag color, defaulting to gray
 
+            // Store the tag in the map
+            tagsMap[tagId] = { tagName, tagColor };
+
             // Create and append the tag item to the tags div
             appendTagItem(tagsContainer, tagId, tagName, tagColor);
         });
 
         // Add right-click listeners after the tags are loaded
         const tagItems = document.querySelectorAll('.tag-item');
-        console.log("TagItems:", tagItems);
         addRightClickListener(tagItems);
 
+        // Return the tagsMap for later use
+        return tagsMap; // Return the map
     }).catch((error) => {
         console.error('Error fetching tags:', error);
+        return {}; // Return an empty map in case of error
     });
 }
+
+
 
 // Function to append a tag item to the tags container
 function appendTagItem(tagsContainer, tagId, tagName, tagColor) {
