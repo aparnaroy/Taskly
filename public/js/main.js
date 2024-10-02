@@ -1018,6 +1018,47 @@ function appendTaskItem(taskList, taskId, description, isDone, tagsAttached, tag
 
 
 
+// // Function to load user's tags
+// function loadUserTags(userId) {
+//     const tagsRef = database.ref(`users/${userId}/tags`);
+
+//     return tagsRef.once('value').then((tagsSnapshot) => { // Return the promise
+//         const tagsContainer = document.getElementById('tags');
+//         tagsContainer.innerHTML = ''; // Clear previous tags
+
+//         // Add a heading for tags
+//         const tagsHeader = document.createElement('h2');
+//         tagsHeader.innerHTML = `Tags <img src="./img/add.png" class="add-tag" alt="Add"/>`;
+//         tagsContainer.appendChild(tagsHeader);
+
+//         const tagsMap = {}; // Create a map to store tagId, tagName, and tagColor
+
+//         tagsSnapshot.forEach((tagSnapshot) => {
+//             const tagId = tagSnapshot.key; // Get tagId
+//             const tagData = tagSnapshot.val(); // Get tag data (tagName and tagColor)
+
+//             const tagName = tagData.tagName; // Get tag name from the data
+//             const tagColor = tagData.tagColor || '#808080'; // Get tag color, defaulting to gray
+
+//             // Store the tag in the map
+//             tagsMap[tagId] = { tagName, tagColor };
+
+//             // Create and append the tag item to the tags div
+//             appendTagItem(tagsContainer, tagId, tagName, tagColor);
+//         });
+
+//         // Add right-click listeners after the tags are loaded
+//         const tagItems = document.querySelectorAll('.tag-item');
+//         addRightClickListener(tagItems);
+
+//         // Return the tagsMap for later use
+//         return tagsMap; // Return the map
+//     }).catch((error) => {
+//         console.error('Error fetching tags:', error);
+//         return {}; // Return an empty map in case of error
+//     });
+// }
+
 // Function to load user's tags
 function loadUserTags(userId) {
     const tagsRef = database.ref(`users/${userId}/tags`);
@@ -1033,6 +1074,13 @@ function loadUserTags(userId) {
 
         const tagsMap = {}; // Create a map to store tagId, tagName, and tagColor
 
+        // Check if there are any existing tags
+        if (!tagsSnapshot.exists()) {
+            console.log("No tags found. Adding starter tags.");
+            addStarterTags(userId); // Add starter tags if none exist
+        }
+
+        // Load existing tags into the tagsMap
         tagsSnapshot.forEach((tagSnapshot) => {
             const tagId = tagSnapshot.key; // Get tagId
             const tagData = tagSnapshot.val(); // Get tag data (tagName and tagColor)
@@ -1058,6 +1106,39 @@ function loadUserTags(userId) {
         return {}; // Return an empty map in case of error
     });
 }
+
+// Function to add starter tags for new users
+function addStarterTags(userId) {
+    const starterTags = [
+        { tagName: "Urgent", tagColor: "#bf1111" },
+        { tagName: "Important", tagColor: "#ffcc00" },
+        { tagName: "Personal", tagColor: "#11a2bf" },
+        { tagName: "Work", tagColor: "#910ea1" }
+    ];
+
+    const tagsRef = database.ref(`users/${userId}/tags`);
+
+    // Create a batch of promises for adding tags
+    const tagPromises = starterTags.map((tag, index) => {
+        const tagId = tagsRef.push().key; // Generate a unique ID for each tag
+        return tagsRef.child(tagId).set({
+            tagName: tag.tagName,
+            tagColor: tag.tagColor
+        });
+    });
+
+    // Wait for all tags to be added
+    return Promise.all(tagPromises)
+        .then(() => {
+            console.log("Starter tags added successfully.");
+            // Optionally, you can reload the tags after adding them
+            return loadUserTags(userId);
+        })
+        .catch((error) => {
+            console.error('Error adding starter tags:', error);
+        });
+}
+
 
 
 
