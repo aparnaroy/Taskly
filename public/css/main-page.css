@@ -717,7 +717,7 @@ body {
 #no-lists-message {
     display: none; 
     text-align: center; 
-    margin-top: 200px;
+    margin-top: 130px;
     font-size: 30px;
     color: #878787;
 }
@@ -725,4 +725,13 @@ body {
 .main-content.left-align #no-lists-message {
     text-align: left;
     margin-left: calc(250px + 135px);
+}
+
+#no-tasks-message {
+    display: none; 
+    text-align: center; 
+    margin-top: 40px;
+    font-size: 27px;
+    font-weight: bold;
+    color: #878787;
 }

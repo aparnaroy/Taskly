@@ -31,7 +31,7 @@ $(function () {
 // Show top navbar when you scroll down
 window.onscroll = function() {
     const navbar = document.querySelector('.top-nav');
-    if (document.body.scrollTop > 50 || document.documentElement.scrollTop > 50) {
+    if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
         navbar.classList.add('scrolled'); // Add the scrolled class
     } else {
         navbar.classList.remove('scrolled'); // Remove the scrolled class
@@ -155,6 +155,9 @@ function addTask() {
         tagsAttached: [],
         done: false
     }).then(() => {
+        // Hide the no tasks message if it exists
+        document.getElementById('no-tasks-message').style.display = 'none';
+
         // Create and display the new task in the UI after saving to Firebase
         const newTask = document.createElement('li');
         newTask.setAttribute('data-task-id', taskRef.key); // Store the task ID for later use
@@ -295,6 +298,13 @@ function deleteTask(event) {
             // Remove the item after the fade-out transition
             setTimeout(() => {
                 listItem.remove();
+
+                // Check if there are any remaining tasks
+                const taskList = document.getElementById('taskList');
+                if (taskList.children.length === 0) {
+                    // If no tasks remain, show the no tasks message
+                    document.getElementById('no-tasks-message').style.display = 'block'; // Show message
+                }
             }, 500); // Match the duration with the CSS transition
         })
         .catch((error) => {
@@ -929,15 +939,27 @@ function displayTasksForList(userId, listId) {
 
     tasksRef.once('value').then((tasksSnapshot) => {
         const taskList = document.getElementById('taskList'); // Get the task list element
+        const noTasksMessage = document.getElementById('no-tasks-message');
         taskList.innerHTML = ''; // Clear existing tasks
 
         // Load tags once and create a tagsMap
         loadUserTags(userId).then(tagsMap => {
-            tasksSnapshot.forEach((taskSnapshot) => {
-                const task = taskSnapshot.val();
-                const taskId = taskSnapshot.key; // Get task ID
-                appendTaskItem(taskList, taskId, task.description, task.done, task.tagsAttached || [], tagsMap); // Pass tagsMap
-            });
+            // Check if there are tasks
+            if (!tasksSnapshot.exists()) {
+                console.log("No tasks found.");
+                // If no tasks, show the no tasks message
+                noTasksMessage.style.display = 'block'; // Show message
+            } else {
+                // Hide the no tasks message if tasks exist
+                noTasksMessage.style.display = 'none'; // Hide message
+                
+                // If tasks exist, iterate and append them
+                tasksSnapshot.forEach((taskSnapshot) => {
+                    const task = taskSnapshot.val();
+                    const taskId = taskSnapshot.key; // Get task ID
+                    appendTaskItem(taskList, taskId, task.description, task.done, task.tagsAttached || [], tagsMap); // Pass tagsMap
+                });
+            }
         });
     }).catch((error) => {
         console.error('Error fetching tasks:', error);
@@ -993,8 +1015,6 @@ function appendTaskItem(taskList, taskId, description, isDone, tagsAttached, tag
 
     taskList.appendChild(newTask);
 }
-
-
 
 
 
