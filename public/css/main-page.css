@@ -335,7 +335,7 @@ body {
 
 /* Center the box by default */
 .box {
-    width: calc(100% - 535px);
+    width: calc(100% - 595px);
     min-width: 300px;
     min-height: 400px;
     padding-top: 15px;
@@ -365,12 +365,12 @@ body {
 /* Left-align title when the sidebar is open */
 .main-content.left-align #list-title  {
     text-align: left; /* Left-align the text */
-    margin-left: calc(250px + 65px); /* Align title with the box */
+    margin-left: calc(250px + 85px); /* Align title with the box */
 }
 
 /* Left-align the box when the sidebar is open */
 .main-content.left-align .box {
-    margin-left: calc(250px + 65px); /* Left-align the box with the side nav bar */
+    margin-left: calc(250px + 85px); /* Left-align the box with the side nav bar */
 }
 
 
