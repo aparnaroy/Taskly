@@ -142,7 +142,7 @@ $('#taskList').on('click', '.tag-button', function(event) {
     toggleTagDropdown(event);
 });
 
-$('#taskList').on('blur', '.task-input.task-text', function(event) {
+$('#taskList').on('input', '.task-input.task-text', function(event) {
     updateTaskText(event);
 });
 
@@ -394,7 +394,7 @@ function addNewList() {
 
 
 // LIST UPDATE
-$("#list-title").on('blur', updateListTitle);
+$("#list-title").on('input', updateListTitle);
 function updateListTitle() {
     const newTitle = document.getElementById('list-title').textContent;
 
@@ -859,6 +859,7 @@ function displayUserInfo(userData) {
     document.querySelector('.user-circle').textContent = userData.displayName.charAt(0);
     document.querySelector('.user-email').textContent = userData.email;
 }
+
 
 // Function to load user's lists
 function loadUserLists(userId) {
