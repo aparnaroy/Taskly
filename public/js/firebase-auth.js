@@ -49,8 +49,8 @@ $(".logout-button").click(signOut);
 function signOut() {
     auth.signOut()
       .then(() => {
+          sessionStorage.removeItem('currentListId');
           window.location.href = "index.html";
-          // console.log('User signed out.');
       })
       .catch((error) => {
           console.error('Error during sign-out:', error);

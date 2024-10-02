@@ -337,6 +337,7 @@ function addNewList() {
 
             // Automatically select and load the new list
             currentListId = newListRef.key;
+            sessionStorage.setItem('currentListId', currentListId);
 
             // Update the list title at the top
             document.getElementById('list-title').textContent = listName;
@@ -689,6 +690,7 @@ function deleteItemOrTag() {
                 listRef.remove().then(() => {
                     console.log('List removed from the database.');
                     // Reload user lists to show the first item
+                    sessionStorage.removeItem('currentListId');
                     loadUserLists(currentUserId);
                 }).catch((error) => {
                     console.error('Error removing list:', error);
@@ -833,17 +835,23 @@ function loadUserLists(userId) {
             }
         });
 
-        // If there are lists, display the tasks for the first list
-        if (firstListId) {
-            displayTasksForList(userId, firstListId);
-            const firstList = listsSnapshot.child(firstListId).val();
-            document.getElementById('list-title').textContent = firstList.listName; // Set the title
+        // Retrieve the stored currentListId from sessionStorage
+        const storedListId = sessionStorage.getItem('currentListId');
+
+        // If there are lists, display the tasks for the stored list ID or the first list
+        if (listsSnapshot.exists()) {
+            const listToDisplayId = storedListId || firstListId;
+
+            displayTasksForList(userId, listToDisplayId);
+            const displayedList = listsSnapshot.child(listToDisplayId).val();
+            document.getElementById('list-title').textContent = displayedList.listName; // Set the title
             
-            // Set the selected class for the first list item
-            const firstListItem = listsContainer.querySelector('.list-item');
-            if (firstListItem) {
-                firstListItem.classList.add('selected-list'); // Add the selected class to the first list item
-                currentListId = firstListId; // Store currentListId
+            // Set the selected class for the displayed list item
+            const displayedListItem = listsContainer.querySelector(`.list-link[data-list-id="${listToDisplayId}"]`);
+            if (displayedListItem) {
+                displayedListItem.closest('.list-item').classList.add('selected-list'); // Add the selected class to the displayed list item
+                currentListId = listToDisplayId; // Store currentListId
+                sessionStorage.setItem('currentListId', currentListId);
             }
         }
 
@@ -880,6 +888,9 @@ function addListClickEvent(userId) {
 
         const selectedListId = $(this).data('list-id'); // Get the listId from the clicked item
         currentListId = selectedListId; // Update the currentListId
+
+        // Store the current list ID in sessionStorage
+        sessionStorage.setItem('currentListId', selectedListId);
 
         displayTasksForList(userId, selectedListId); // Fetch and display tasks for the selected list
 
