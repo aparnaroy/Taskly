@@ -346,6 +346,14 @@ function addNewList() {
             $('.list-item').removeClass('selected-list'); // Remove class from other list items
             newList.classList.add('selected-list'); // Add class to the new list item
 
+            const noListsMessage = document.getElementById('no-lists-message');
+            noListsMessage.style.display = 'none'; // Hide the message
+            // Show the list title and box again
+            const listTitle = document.getElementById('list-title');
+            const box = document.querySelector('.box');
+            listTitle.style.display = 'block'; // Show the list title
+            box.style.display = 'block'; // Show the box
+
             // Display tasks for the new list (empty initially)
             displayTasksForList(currentUserId, newListRef.key);
 
@@ -817,6 +825,22 @@ function loadUserLists(userId) {
     listsRef.once('value').then((listsSnapshot) => {
         const listsContainer = document.getElementById('list-items');
         listsContainer.innerHTML = ''; // Clear previous lists
+
+        const noListsMessage = document.getElementById('no-lists-message');
+        const listTitle = document.getElementById('list-title');
+        const box = document.querySelector('.box');
+
+        // Check if there are any lists
+        if (!listsSnapshot.exists()) {
+            console.log('No lists found.');
+            // Hide the lists container and show the no lists message
+            listTitle.style.display = 'none';
+            box.style.display = 'none';
+            noListsMessage.style.display = 'block';
+            return; // Exit the function
+        } else {
+            noListsMessage.style.display = 'none'; // Hide the message
+        }
 
         let firstListId = null; // To store the first listId
         

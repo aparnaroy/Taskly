@@ -713,3 +713,16 @@ body {
     opacity: 0.4; 
 }
 
+
+#no-lists-message {
+    display: none; 
+    text-align: center; 
+    margin-top: 200px;
+    font-size: 30px;
+    color: #878787;
+}
+
+.main-content.left-align #no-lists-message {
+    text-align: left;
+    margin-left: calc(250px + 135px);
+}
