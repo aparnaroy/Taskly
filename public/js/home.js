@@ -12,6 +12,9 @@ $('#lightdarkIcon').on('click', toggleLightDarkModeHome);
 function toggleLightDarkModeHome() {
     const lightDarkIcon = document.getElementById('lightdarkIcon');
     const screenshot = document.getElementById('screenshot');
+    const listsScreenshot = document.getElementById('lists-screenshot');
+    const tagsScreenshot = document.getElementById('tags-screenshot');
+    const confettiScreenshot = document.getElementById('confetti-screenshot');
     const body = document.body;
     
     // Toggle light/dark mode
@@ -20,8 +23,14 @@ function toggleLightDarkModeHome() {
     if (lightDarkIcon.src.includes('lightdark-icon-white.png')) {
         lightDarkIcon.src = './img/lightdark-icon-black.png';
         screenshot.src = './img/screenshot.png';
+        listsScreenshot.src = './img/lists-screenshot.png';
+        tagsScreenshot.src = './img/tags-screenshot.png';
+        confettiScreenshot.src = './img/confetti-screenshot.png';
     } else {
         lightDarkIcon.src = './img/lightdark-icon-white.png';
         screenshot.src = './img/screenshot-dark.png';
+        listsScreenshot.src = './img/lists-screenshot-dark.png';
+        tagsScreenshot.src = './img/tags-screenshot-dark.png';
+        confettiScreenshot.src = './img/confetti-screenshot-dark.png';
     }
 }
