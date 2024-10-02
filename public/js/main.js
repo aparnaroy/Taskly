@@ -564,17 +564,18 @@ function addTagToTask(event, tagText) {
         .find(tag => tag.textContent === tagText);
     
     if (existingTag) {
-        // If the tag exists, remove it from the task UI
-        listItem.removeChild(existingTag);
-
         // Also remove the tag from the Firebase database
         taskRef.child('tagsAttached').once('value', (snapshot) => {
             const tags = snapshot.val() || []; // Get existing tags or initialize as empty array
-            console.log("Tags", tags);
+            // console.log("Tags", tags);
+            // console.log("Existing Tag", existingTag);
             const tagIdToRemove = existingTag.getAttribute('data-tag-id'); // Get the tag ID to remove
-            console.log("TagId to Remove", tagIdToRemove);
+            // console.log("TagId to Remove", tagIdToRemove);
             const updatedTags = tags.filter(tagId => tagId !== tagIdToRemove); // Remove the tag by ID
-            console.log("Updated Tags", updatedTags);
+            // console.log("Updated Tags", updatedTags);
+
+            // If the tag exists, remove it from the task UI
+            listItem.removeChild(existingTag);
 
             // Update the Firebase database with the new array of tags
             taskRef.update({ tagsAttached: updatedTags })
@@ -1018,6 +1019,7 @@ function appendTaskItem(taskList, taskId, description, isDone, tagsAttached, tag
                 tagElement.className = 'tag-rectangle'; // Add a class for styling
                 tagElement.style.backgroundColor = tagColor; // Set the color from the tag info
                 tagElement.textContent = tagName; // Set the tag name
+                tagElement.setAttribute('data-tag-id', tagId); // Set the data-tag-id attribute to the tagId
 
                 // Check if the task is marked as completed and add dull class if needed
                 if (newTask.classList.contains('completed')) {
