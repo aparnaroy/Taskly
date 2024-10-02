@@ -5,6 +5,12 @@ let currentUserId = '';
 
 // Document ready function
 $(function () {
+    // If light or dark mode is saved, apply it on page load
+    const savedTheme = sessionStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+        toggleLightDarkMode();
+    }
+
     // Update tag color as soon as it is changed in the color picker
     document.querySelectorAll('#tags .color-picker').forEach(colorPicker => {
         colorPicker.addEventListener('input', updateTagColor);
@@ -102,6 +108,13 @@ function toggleLightDarkMode() {
     
     // Toggle light/dark mode
     body.classList.toggle('dark-mode');
+
+    // Save the current mode in sessionStorage
+    if (body.classList.contains('dark-mode')) {
+        sessionStorage.setItem('theme', 'dark');
+    } else {
+        sessionStorage.setItem('theme', 'light');
+    }
     
     // Swap icon colors
     if (sidebarIcon.src.includes('sidebar-icon-black.png')) {
@@ -990,11 +1003,6 @@ function appendTaskItem(taskList, taskId, description, isDone, tagsAttached, tag
     const newTask = document.createElement('li');
     newTask.setAttribute('data-task-id', taskId); // Store the task ID
 
-    // Add the completed class if the task is done
-    if (isDone) {
-        newTask.classList.add('completed'); // Add completed class for completed tasks
-    }
-
     // Create the inner HTML for the task
     newTask.innerHTML = `
         <div class="circle"></div>
@@ -1003,6 +1011,14 @@ function appendTaskItem(taskList, taskId, description, isDone, tagsAttached, tag
         <div class="tag-dropdown"></div>
         <img src="./img/delete.png" class="delete-button" alt="Delete"/>
     `;
+
+    const taskTextElement = newTask.querySelector('.task-text'); // Get the task-text div element
+
+    // Add the completed class to the task-text div if the task is done
+    if (isDone) {
+        newTask.classList.add('completed'); // Add completed class for completed tasks
+        taskTextElement.classList.add('completed');
+    }
 
     const tagButtonElement = newTask.querySelector('.tag-button');
 
@@ -1036,47 +1052,6 @@ function appendTaskItem(taskList, taskId, description, isDone, tagsAttached, tag
 }
 
 
-
-// // Function to load user's tags
-// function loadUserTags(userId) {
-//     const tagsRef = database.ref(`users/${userId}/tags`);
-
-//     return tagsRef.once('value').then((tagsSnapshot) => { // Return the promise
-//         const tagsContainer = document.getElementById('tags');
-//         tagsContainer.innerHTML = ''; // Clear previous tags
-
-//         // Add a heading for tags
-//         const tagsHeader = document.createElement('h2');
-//         tagsHeader.innerHTML = `Tags <img src="./img/add.png" class="add-tag" alt="Add"/>`;
-//         tagsContainer.appendChild(tagsHeader);
-
-//         const tagsMap = {}; // Create a map to store tagId, tagName, and tagColor
-
-//         tagsSnapshot.forEach((tagSnapshot) => {
-//             const tagId = tagSnapshot.key; // Get tagId
-//             const tagData = tagSnapshot.val(); // Get tag data (tagName and tagColor)
-
-//             const tagName = tagData.tagName; // Get tag name from the data
-//             const tagColor = tagData.tagColor || '#808080'; // Get tag color, defaulting to gray
-
-//             // Store the tag in the map
-//             tagsMap[tagId] = { tagName, tagColor };
-
-//             // Create and append the tag item to the tags div
-//             appendTagItem(tagsContainer, tagId, tagName, tagColor);
-//         });
-
-//         // Add right-click listeners after the tags are loaded
-//         const tagItems = document.querySelectorAll('.tag-item');
-//         addRightClickListener(tagItems);
-
-//         // Return the tagsMap for later use
-//         return tagsMap; // Return the map
-//     }).catch((error) => {
-//         console.error('Error fetching tags:', error);
-//         return {}; // Return an empty map in case of error
-//     });
-// }
 
 // Function to load user's tags
 function loadUserTags(userId) {
