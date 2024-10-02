@@ -336,15 +336,14 @@ function addNewList() {
             console.log(newList)
 
             // Automatically select and load the new list
-            // currentListName = listName;
             currentListId = newListRef.key;
 
             // Update the list title at the top
             document.getElementById('list-title').textContent = listName;
 
             // Remove 'selected-list' class from other lists and add it to the new one
-            $('.list-link').removeClass('selected-list'); // Remove class from other list links
-            newList.querySelector('.list-link').classList.add('selected-list'); // Add class to the new list link
+            $('.list-item').removeClass('selected-list'); // Remove class from other list items
+            newList.classList.add('selected-list'); // Add class to the new list item
 
             // Display tasks for the new list (empty initially)
             displayTasksForList(currentUserId, newListRef.key);
@@ -684,11 +683,24 @@ function deleteItemOrTag() {
 
             const listRef = database.ref(`users/${currentUserId}/lists/${listId}`);
             targetElement.remove(); // Remove the list from the DOM
-            listRef.remove().then(() => {
-                console.log('List removed from the database.');
-            }).catch((error) => {
-                console.error('Error removing list:', error);
-            });
+            
+            // Check if the deleted list was the current list
+            if (currentListId === listId) {
+                listRef.remove().then(() => {
+                    console.log('List removed from the database.');
+                    // Reload user lists to show the first item
+                    loadUserLists(currentUserId);
+                }).catch((error) => {
+                    console.error('Error removing list:', error);
+                });
+            } else {
+                // If not the current list, just remove it from the database
+                listRef.remove().then(() => {
+                    console.log('List removed from the database.');
+                }).catch((error) => {
+                    console.error('Error removing list:', error);
+                });
+            }
         
         // If it's a Tag item
         } else if (targetElement.classList.contains('tag-item')) {
@@ -826,11 +838,11 @@ function loadUserLists(userId) {
             displayTasksForList(userId, firstListId);
             const firstList = listsSnapshot.child(firstListId).val();
             document.getElementById('list-title').textContent = firstList.listName; // Set the title
-
-            // Set the selected class for the first list link
-            const firstListLink = listsContainer.querySelector('.list-link');
-            if (firstListLink) {
-                firstListLink.classList.add('selected-list'); // Add the selected class to the first list link
+            
+            // Set the selected class for the first list item
+            const firstListItem = listsContainer.querySelector('.list-item');
+            if (firstListItem) {
+                firstListItem.classList.add('selected-list'); // Add the selected class to the first list item
                 currentListId = firstListId; // Store currentListId
             }
         }
@@ -861,9 +873,10 @@ function addListClickEvent(userId) {
         event.preventDefault();
         
         // Remove the 'selected-list' class from all list items
-        $('.list-link').removeClass('selected-list');
-        // Add the 'selected-list' class to the clicked link
-        $(this).addClass('selected-list');
+        $('.list-item').removeClass('selected-list'); // Change this line to target .list-item instead
+
+        // Add the 'selected-list' class to the parent .list-item of the clicked link
+        $(this).closest('.list-item').addClass('selected-list'); // Use closest to find the parent
 
         const selectedListId = $(this).data('list-id'); // Get the listId from the clicked item
         currentListId = selectedListId; // Update the currentListId
