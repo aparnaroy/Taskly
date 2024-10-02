@@ -26,16 +26,14 @@ function signIn() {
             userRef.set({
                 displayName: user.displayName,
                 email: user.email,
-                // Add any additional user info you want to store
-                // TODO: add random user profile icon color
             });
 
             // Wait for authentication state to be updated
             auth.onAuthStateChanged((user) => {
                 if (user) {
                     console.log('User UID:', user.uid);
-                    window.location.href = "main-page.html"
-                    // TODO: change to start-up
+                    // window.location.href = "main-page.html"
+                    window.location.href = "start-up.html"
                 }
             });
         })
