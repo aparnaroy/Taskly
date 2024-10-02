@@ -814,6 +814,23 @@ function initializeUser(userId) {
         const userData = snapshot.val();
         if (userData) {
             displayUserInfo(userData); // Display user information
+
+            // Check if the user already has a profile circle color
+            if (!userData.profileColor) {
+                console.log('Generating profile color for new user.');
+                const randomColor = getRandomColor(); // Generate a random color
+                userRef.update({ profileColor: randomColor }) // Save to Firebase
+                    .then(() => {
+                        document.querySelector('.user-circle').style.backgroundColor = randomColor; // Set color in DOM
+                    })
+                    .catch((error) => {
+                        console.error('Error saving color to Firebase:', error);
+                    });
+            } else {
+                // If the color exists, use it
+                document.querySelector('.user-circle').style.backgroundColor = userData.profileColor; // Set color in DOM
+            }
+
             loadUserLists(userId); // Load user's lists
             loadUserTags(userId); // Load user's tags
         }
