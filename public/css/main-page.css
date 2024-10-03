@@ -568,7 +568,7 @@ body {
 }
 
 .tag-rectangle:hover {
-    filter: brightness(1.3); /* Lighter shade on hover */
+    filter: brightness(1.2); /* Lighter shade on hover */
 }
 
 .tags {

@@ -827,6 +827,7 @@ function updateUITagRemoval(tagId) {
 $(document).ready(function() {
     auth.onAuthStateChanged((user) => {
         if (user) {
+            console.log("HIII");
             currentUserId = user.uid; // Store the current user ID
             initializeUser(user.uid); // Initialize user data
         } else {
@@ -840,9 +841,12 @@ $(document).ready(function() {
 // Function to initialize user data
 function initializeUser(userId) {
     const userRef = database.ref(`users/${userId}`);
+    console.log('User ref:', userRef);
 
     userRef.once('value').then((snapshot) => {
         const userData = snapshot.val();
+
+        console.log('User data:', userData);
         if (userData) {
             displayUserInfo(userData); // Display user information
 

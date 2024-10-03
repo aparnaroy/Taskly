@@ -21,24 +21,23 @@ function signIn() {
     auth.signInWithPopup(provider)
         .then((result) => {
             const user = result.user;
+
             // Store user info in the database
             const userRef = database.ref('users/' + user.uid);
             userRef.set({
                 displayName: user.displayName,
                 email: user.email,
-            });
-
-            // Wait for authentication state to be updated
-            auth.onAuthStateChanged((user) => {
-                if (user) {
-                    console.log('User UID:', user.uid);
-                    // window.location.href = "main-page.html"
-                    window.location.href = "start-up.html"
-                }
+            })
+            .then(() => {
+                console.log('User data successfully written to the database.');
+                window.location.href = "main-page.html"; // or wherever you want to redirect
+            })
+            .catch((error) => {
+                console.log('Error writing user data:', error);
             });
         })
         .catch((error) => {
-            console.error('Error during sign-in:', error);
+            console.log('Error during sign-in:', error);
         });
 }
 
