@@ -8,6 +8,11 @@ window.onscroll = function() {
     }
 };
 
+// Clicking on logo reloads the home page
+$(".logo").click(function() {
+    window.location.href = 'index.html';
+});
+
 $('#lightdarkIcon').on('click', toggleLightDarkModeHome);
 function toggleLightDarkModeHome() {
     const lightDarkIcon = document.getElementById('lightdarkIcon');

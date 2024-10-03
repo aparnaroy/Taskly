@@ -54,6 +54,10 @@ body {
     z-index: 30;
 }
 
+.logo:hover {
+    cursor: pointer;
+}
+
 /* Sidebar Icon */
 .menu-icon {
     position: fixed;

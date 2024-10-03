@@ -34,6 +34,11 @@ $(function () {
     });
 });
 
+// Clicking on logo takes you back to home page
+$(".logo").click(function() {
+    window.location.href = 'index.html';
+});
+
 // Show top navbar when you scroll down
 window.onscroll = function() {
     const navbar = document.querySelector('.top-nav');
@@ -515,7 +520,13 @@ function toggleTagDropdown(event) {
             dropdown.appendChild(tagOption);
         });
 
-        // Toggle visibility of the dropdown
+        // Untoggle other tag dropdowns
+        const tagDropdowns = document.querySelectorAll('.tag-dropdown.visible');
+        tagDropdowns.forEach(dropdown => {
+            dropdown.classList.remove('visible'); // Hide all visible dropdowns
+        });
+
+        // Toggle visibility of the clicked dropdown
         dropdown.classList.toggle('visible');
     });
 }
@@ -664,6 +675,7 @@ window.onclick = function(event) {
     }
 
     if (!event.target.closest('.tag-button') && !event.target.closest('.tag-dropdown')) {
+        console.log('Clicked outside tag dropdown');
         // Get all dropdowns
         const tagDropdowns = document.querySelectorAll('.tag-dropdown.visible');
         tagDropdowns.forEach(dropdown => {
