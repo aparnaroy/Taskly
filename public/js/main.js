@@ -332,7 +332,6 @@ function deleteTask(event) {
 // LIST CREATE
 $(".add-list").click(addNewList);
 function addNewList() {
-    console.log("ADDING LIST");
     const listName = prompt("Enter the name of your new list:");
 
     // Validate that the list name is not empty or whitespace
@@ -973,8 +972,6 @@ function displayTasksForList(userId, listId) {
         const noTasksMessage = document.getElementById('no-tasks-message');
         taskList.innerHTML = ''; // Clear existing tasks
 
-        console.log('Fetching tasks for list:', listId);
-        console.log('Tasks List before:', taskList);
 
         // Load tags once and create a tagsMap
         loadUserTags(userId).then(tagsMap => {
@@ -993,7 +990,6 @@ function displayTasksForList(userId, listId) {
                     const taskId = taskSnapshot.key; // Get task ID
                     appendTaskItem(taskList, taskId, task.description, task.done, task.tagsAttached || [], tagsMap); // Pass tagsMap
                 });
-                console.log('Tasks List AFTER:', taskList);
             }
         });
     }).catch((error) => {
@@ -1053,7 +1049,6 @@ function appendTaskItem(taskList, taskId, description, isDone, tagsAttached, tag
     }
 
     taskList.appendChild(newTask);
-    console.log('Task List in appendTaskItem():', taskList);
 }
 
 
