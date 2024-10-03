@@ -756,6 +756,10 @@ function deleteListOrTag() {
 
             targetElement.remove();  // Remove the tag from the DOM
 
+            delete activeTagsMap[tagId]; // Remove from activeTagsMap
+            selectedTagIds.splice(selectedTagIds.indexOf(tagId), 1);
+            displayTasksForList(currentUserId, currentListId); // Update the task list
+
             // Remove tag from all tasks and then remove the tag from the database
             removeTagFromAllTasks(tagId).then(() => {
                 console.log('Tag removed from all tasks in the database.');
