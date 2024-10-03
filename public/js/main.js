@@ -675,7 +675,6 @@ window.onclick = function(event) {
     }
 
     if (!event.target.closest('.tag-button') && !event.target.closest('.tag-dropdown')) {
-        console.log('Clicked outside tag dropdown');
         // Get all dropdowns
         const tagDropdowns = document.querySelectorAll('.tag-dropdown.visible');
         tagDropdowns.forEach(dropdown => {
