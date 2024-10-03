@@ -2,6 +2,8 @@ import { firebaseApp, auth, database } from './firebase-auth.js';
 
 let currentListId = '';
 let currentUserId = '';
+let selectedTagIds = [];
+const activeTagsMap = {};
 
 // Document ready function
 $(function () {
@@ -974,7 +976,34 @@ function addListClickEvent(userId) {
     });
 }
 
-// Function to display tasks for a specific list
+
+// Initialize event listeners once when the document is ready
+$(document).ready(function() {
+    // Event delegation for tag clicks
+    $('#tags').on('click', '.tag-name', function(event) {
+        event.preventDefault();
+
+        const tagItem = $(this).closest('.tag-item');
+        const tagId = tagItem.data('tag-id');
+
+        if (activeTagsMap[tagId]) {
+            // Tag is already selected, remove the filter
+            delete activeTagsMap[tagId]; // Remove from activeTagsMap
+            selectedTagIds.splice(selectedTagIds.indexOf(tagId), 1);
+            tagItem.removeClass('active-tag');
+        } else {
+            // Select this tag, set it as the filter
+            activeTagsMap[tagId] = true; // Add to activeTagsMap
+            selectedTagIds.push(tagId);
+            tagItem.addClass('active-tag');
+        }
+
+        // Re-display tasks with the filter
+        displayTasksForList(currentUserId, currentListId);
+    });
+});
+
+// Function to display tasks for a specific list with tag filtering
 function displayTasksForList(userId, listId) {
     const tasksRef = database.ref(`users/${userId}/lists/${listId}/tasks`);
 
@@ -983,23 +1012,25 @@ function displayTasksForList(userId, listId) {
         const noTasksMessage = document.getElementById('no-tasks-message');
         taskList.innerHTML = ''; // Clear existing tasks
 
-
         // Load tags once and create a tagsMap
         loadUserTags(userId).then(tagsMap => {
             // Check if there are tasks
             if (!tasksSnapshot.exists()) {
                 console.log("No tasks found.");
-                // If no tasks, show the no tasks message
                 noTasksMessage.style.display = 'block'; // Show message
             } else {
-                // Hide the no tasks message if tasks exist
                 noTasksMessage.style.display = 'none'; // Hide message
-                
+
                 // If tasks exist, iterate and append them
                 tasksSnapshot.forEach((taskSnapshot) => {
                     const task = taskSnapshot.val();
                     const taskId = taskSnapshot.key; // Get task ID
-                    appendTaskItem(taskList, taskId, task.description, task.done, task.tagsAttached || [], tagsMap); // Pass tagsMap
+                    const taskTags = task.tagsAttached || [];
+
+                    // If a tag is selected, only display tasks with that tag (change `every` to `some` to display tasks with ANY selected tag instead of ALL selected tags)
+                    if (selectedTagIds.length === 0 || selectedTagIds.every(tag => taskTags.includes(tag))) {
+                        appendTaskItem(taskList, taskId, task.description, task.done, taskTags, tagsMap); // Pass tagsMap
+                    }
                 });
             }
         });
@@ -1087,17 +1118,21 @@ function loadUserTags(userId) {
 
         // Load existing tags into the tagsMap
         tagsSnapshot.forEach((tagSnapshot) => {
-            const tagId = tagSnapshot.key; // Get tagId
-            const tagData = tagSnapshot.val(); // Get tag data (tagName and tagColor)
+            const tagId = tagSnapshot.key;
+            const tagData = tagSnapshot.val();
+            const tagName = tagData.tagName;
+            const tagColor = tagData.tagColor || '#808080';
 
-            const tagName = tagData.tagName; // Get tag name from the data
-            const tagColor = tagData.tagColor || '#808080'; // Get tag color, defaulting to gray
-
-            // Store the tag in the map
             tagsMap[tagId] = { tagName, tagColor };
-
-            // Create and append the tag item to the tags div
             appendTagItem(tagsContainer, tagId, tagName, tagColor);
+
+            // Check if the tag is active and add the class if necessary
+            if (activeTagsMap[tagId]) {
+                const tagItem = tagsContainer.querySelector(`.tag-item[data-tag-id="${tagId}"]`);
+                if (tagItem) {
+                    tagItem.classList.add('active-tag');
+                }
+            }
         });
 
         // Add right-click listeners after the tags are loaded
