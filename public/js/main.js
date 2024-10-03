@@ -706,8 +706,8 @@ document.addEventListener('click', function() {
 
 
 // LIST DELETE + TAG DELETE
-$('#delete-option').on('click', deleteItemOrTag);
-function deleteItemOrTag() { 
+$('#delete-option').on('click', deleteListOrTag);
+function deleteListOrTag() { 
     if (targetElement) {
         // If it's a List item
         if (targetElement.classList.contains('list-item')) {
@@ -722,6 +722,7 @@ function deleteItemOrTag() {
                 listRef.remove().then(() => {
                     console.log('List removed from the database.');
                     // Reload user lists to show the first item
+                    currentListId = null;
                     sessionStorage.removeItem('currentListId');
                     loadUserLists(currentUserId);
                 }).catch((error) => {
@@ -847,6 +848,7 @@ function initializeUser(userId) {
 
             loadUserLists(userId); // Load user's lists
             loadUserTags(userId); // Load user's tags
+            addListClickEvent(userId); // Add event listeners for list links
         }
     }).catch((error) => {
         console.error('Error fetching user data:', error);
@@ -921,9 +923,6 @@ function loadUserLists(userId) {
             }
         }
 
-        // Add event listeners for list links
-        addListClickEvent(userId);
-
         // Add right-click listeners after the lists are loaded
         const listItems = document.querySelectorAll('.list-item');
         addRightClickListener(listItems);
@@ -974,6 +973,9 @@ function displayTasksForList(userId, listId) {
         const noTasksMessage = document.getElementById('no-tasks-message');
         taskList.innerHTML = ''; // Clear existing tasks
 
+        console.log('Fetching tasks for list:', listId);
+        console.log('Tasks List before:', taskList);
+
         // Load tags once and create a tagsMap
         loadUserTags(userId).then(tagsMap => {
             // Check if there are tasks
@@ -991,6 +993,7 @@ function displayTasksForList(userId, listId) {
                     const taskId = taskSnapshot.key; // Get task ID
                     appendTaskItem(taskList, taskId, task.description, task.done, task.tagsAttached || [], tagsMap); // Pass tagsMap
                 });
+                console.log('Tasks List AFTER:', taskList);
             }
         });
     }).catch((error) => {
@@ -1050,6 +1053,7 @@ function appendTaskItem(taskList, taskId, description, isDone, tagsAttached, tag
     }
 
     taskList.appendChild(newTask);
+    console.log('Task List in appendTaskItem():', taskList);
 }
 
 
