@@ -428,12 +428,13 @@ body {
     border-bottom: 1px solid #ccc; /* Thin horizontal line */
     font-size: 18px;
     position: relative; /* For positioning if needed */
-    transition: background-color 0.3s ease; /* Smooth background color transition */
     justify-content: space-between;
+    transition: background-color 0.3s ease; /* Smooth background transition */
 }
 
 #taskList li:hover {
     background-color: rgb(237, 237, 237);
+    cursor: grab;
 }
 
 #taskList li:last-child {
@@ -674,6 +675,10 @@ body {
     color: #a3a1a1; /* Gray out the text */
 }
 
+.task-input:hover {
+    cursor: text;
+}
+
 
 @keyframes fall {
     0% {
@@ -739,4 +744,8 @@ body {
     font-size: 27px;
     font-weight: bold;
     color: #878787;
+}
+
+.dragging-background {
+    background: linear-gradient(to bottom right, #0279c9, #372991, #8e02ac);
 }

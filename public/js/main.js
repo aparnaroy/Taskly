@@ -1231,7 +1231,8 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize Sortable on the task list
     const sortable = new Sortable(taskList, {
-        animation: 300, // Smooth animation
+        animation: 150, // Smooth animation
+        ghostClass: 'dragging-background',
         onEnd: function(event) {
             // You can update the task order in the database here
             updateTaskOrderInDatabase();
