@@ -30,7 +30,8 @@ function signIn() {
             })
             .then(() => {
                 console.log('User data successfully written to the database.');
-                window.location.href = "main-page.html"; // or wherever you want to redirect
+                // window.location.href = "main-page.html"; 
+                window.location.href = "start-up.html"; 
             })
             .catch((error) => {
                 console.log('Error writing user data:', error);
