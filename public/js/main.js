@@ -827,7 +827,6 @@ function updateUITagRemoval(tagId) {
 $(document).ready(function() {
     auth.onAuthStateChanged((user) => {
         if (user) {
-            console.log("HIII");
             currentUserId = user.uid; // Store the current user ID
             initializeUser(user.uid); // Initialize user data
         } else {
@@ -841,12 +840,10 @@ $(document).ready(function() {
 // Function to initialize user data
 function initializeUser(userId) {
     const userRef = database.ref(`users/${userId}`);
-    console.log('User ref:', userRef);
 
     userRef.once('value').then((snapshot) => {
         const userData = snapshot.val();
 
-        console.log('User data:', userData);
         if (userData) {
             displayUserInfo(userData); // Display user information
 
@@ -1013,7 +1010,7 @@ $(document).ready(function() {
 
 // Function to display tasks for a specific list with tag filtering
 function displayTasksForList(userId, listId) {
-    const tasksRef = database.ref(`users/${userId}/lists/${listId}/tasks`);
+    const tasksRef = database.ref(`users/${userId}/lists/${listId}/tasks`).orderByChild('order'); // Show tasks in order
 
     tasksRef.once('value').then((tasksSnapshot) => {
         const taskList = document.getElementById('taskList'); // Get the task list element
@@ -1208,4 +1205,30 @@ function appendTagItem(tagsContainer, tagId, tagName, tagColor) {
     // Add event listener to the color picker
     const colorPicker = tagItem.querySelector('.color-picker');
     colorPicker.addEventListener('input', updateTagColor);
+}
+
+
+
+// Function to make tasks draggable to reorder them in the list!!
+document.addEventListener('DOMContentLoaded', function() {
+    const taskList = document.getElementById('taskList');
+    
+    // Initialize Sortable on the task list
+    const sortable = new Sortable(taskList, {
+        animation: 300, // Smooth animation
+        onEnd: function(event) {
+            // You can update the task order in the database here
+            updateTaskOrderInDatabase();
+        }
+    });
+});
+
+// Update the task order in Firebase
+function updateTaskOrderInDatabase() {
+    const tasks = document.querySelectorAll('#taskList li');
+    tasks.forEach((task, index) => {
+        const taskId = task.getAttribute('data-task-id');
+        const taskRef = database.ref(`users/${currentUserId}/lists/${currentListId}/tasks/${taskId}`);
+        taskRef.update({ order: index });
+    });
 }
