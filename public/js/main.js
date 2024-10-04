@@ -166,32 +166,48 @@ function addTask() {
 
     if (taskText.trim() === '') return; // Ignore empty input
 
-    // Create a new reference for the task under the specific user and list
-    const taskRef = database.ref(`users/${currentUserId}/lists/${currentListId}/tasks`).push();
+    // Reference to the tasks for the current user and list
+    const tasksRef = database.ref(`users/${currentUserId}/lists/${currentListId}/tasks`);
 
-    // Save the task to Firebase under the taskId
-    taskRef.set({
-        description: taskText,
-        tagsAttached: [],
-        done: false
-    }).then(() => {
-        // Hide the no tasks message if it exists
-        document.getElementById('no-tasks-message').style.display = 'none';
+    // First, fetch all tasks to determine the max order value
+    tasksRef.once('value').then((snapshot) => {
+        let maxOrder = 0;
 
-        // Create and display the new task in the UI after saving to Firebase
-        const newTask = document.createElement('li');
-        newTask.setAttribute('data-task-id', taskRef.key); // Store the task ID for later use
+        // Iterate over tasks to find the highest order value
+        snapshot.forEach((taskSnapshot) => {
+            const task = taskSnapshot.val();
+            if (task.order !== undefined && task.order > maxOrder) {
+                maxOrder = task.order;
+            }
+        });
 
-        newTask.innerHTML = `<div class="circle"></div>
-                             <div class="task-input task-text" contenteditable="true">${taskText}</div>
-                             <img src="./img/tag.png" class="tag-button" />
-                             <div class="tag-dropdown"></div>
-                             <img src="./img/delete.png" class="delete-button" alt="Delete"/>`;
-        taskList.appendChild(newTask);
-    }).catch((error) => {
-        console.error('Error adding task:', error);
+        // Create a new reference for the task under the specific user and list
+        const taskRef = tasksRef.push();
+
+        // Save the task to Firebase under the taskId
+        taskRef.set({
+            description: taskText,
+            tagsAttached: [],
+            done: false,
+            order: maxOrder + 1
+        }).then(() => {
+            // Hide the no tasks message if it exists
+            document.getElementById('no-tasks-message').style.display = 'none';
+
+            // Create and display the new task in the UI after saving to Firebase
+            const newTask = document.createElement('li');
+            newTask.setAttribute('data-task-id', taskRef.key); // Store the task ID for later use
+
+            newTask.innerHTML = `<div class="circle"></div>
+                                <div class="task-input task-text" contenteditable="true">${taskText}</div>
+                                <img src="./img/tag.png" class="tag-button" />
+                                <div class="tag-dropdown"></div>
+                                <img src="./img/delete.png" class="delete-button" alt="Delete"/>`;
+            taskList.appendChild(newTask);
+        }).catch((error) => {
+            console.error('Error adding task:', error);
+        });
     });
-
     input.value = ''; // Clear the input field
 }
 
