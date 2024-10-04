@@ -24,7 +24,7 @@ function signIn() {
 
             // Store user info in the database
             const userRef = database.ref('users/' + user.uid);
-            userRef.set({
+            userRef.update({
                 displayName: user.displayName,
                 email: user.email,
             })
