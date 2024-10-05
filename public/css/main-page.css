@@ -587,6 +587,7 @@ body {
 
 .tag-item:hover {
     background-color: #272727;
+    cursor: grab;
 }
 
 .active-tag .tag-name {
@@ -621,6 +622,7 @@ body {
 
 .list-item:hover {
     background-color: #272727;
+    cursor: grab;
 }
 
 

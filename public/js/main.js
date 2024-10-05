@@ -359,55 +359,74 @@ function addNewList() {
 
     // Validate that the list name is not empty or whitespace
     if (listName && listName.trim() !== '') {
-        // Generate a unique ID for the new list (Firebase will handle this automatically)
-        const listsRef = database.ref(`users/${currentUserId}/lists`); // Reference to user's lists
-        const newListRef = listsRef.push(); // Create a new list under the current user
+        // Reference to the lists for the current user
+        const listsRef = database.ref(`users/${currentUserId}/lists`);
 
-        // Prepare the list data
-        const newListData = {
-            listName: listName, // Set the list name
-            tasks: {} // Initialize an empty tasks object for this list
-        };
+        // Fetch all lists to determine the max order value
+        listsRef.once('value').then((snapshot) => {
+            let maxOrder = 0;
 
-        // Save the new list data in Firebase
-        newListRef.set(newListData).then(() => {
-            // On success, add the new list to the sidebar
-            const lists = document.getElementById('list-items');
+            // Iterate over lists to find the highest order value
+            snapshot.forEach((listSnapshot) => {
+                const list = listSnapshot.val();
+                if (list.order !== undefined && list.order > maxOrder) {
+                    maxOrder = list.order;
+                }
+            });
 
-            const newList = document.createElement('div');
-            newList.classList.add('list-item');
-            newList.innerHTML = `<a href="#" class="list-link" data-list-id="${newListRef.key}">${listName}</a>`;
-            lists.appendChild(newList); // Append to the sidebar
-            console.log(newList)
+            // Generate a unique ID for the new list
+            const newListRef = listsRef.push(); // Create a new list under the current user
 
-            // Automatically select and load the new list
-            currentListId = newListRef.key;
-            sessionStorage.setItem('currentListId', currentListId);
+            // Prepare the list data with the order field
+            const newListData = {
+                listName: listName, // Set the list name
+                tasks: {}, // Initialize an empty tasks object for this list
+                order: maxOrder + 1 // Set the order to max order + 1
+            };
 
-            // Update the list title at the top
-            document.getElementById('list-title').textContent = listName;
+            // Save the new list data in Firebase
+            newListRef.set(newListData).then(() => {
+                // On success, add the new list to the sidebar
+                const lists = document.getElementById('list-items');
 
-            // Remove 'selected-list' class from other lists and add it to the new one
-            $('.list-item').removeClass('selected-list'); // Remove class from other list items
-            newList.classList.add('selected-list'); // Add class to the new list item
+                const newList = document.createElement('div');
+                newList.classList.add('list-item');
+                newList.innerHTML = `<a href="#" class="list-link" data-list-id="${newListRef.key}">${listName}</a>`;
+                lists.appendChild(newList); // Append to the sidebar
+                console.log(newList)
 
-            const noListsMessage = document.getElementById('no-lists-message');
-            noListsMessage.style.display = 'none'; // Hide the message
-            // Show the list title and box again
-            const listTitle = document.getElementById('list-title');
-            const box = document.querySelector('.box');
-            listTitle.style.display = 'block'; // Show the list title
-            box.style.display = 'block'; // Show the box
+                // Automatically select and load the new list
+                currentListId = newListRef.key;
+                sessionStorage.setItem('currentListId', currentListId);
 
-            // Display tasks for the new list (empty initially)
-            displayTasksForList(currentUserId, newListRef.key);
+                // Update the list title at the top
+                document.getElementById('list-title').textContent = listName;
 
-            // Add right-click listeners for all lists, including the new one
-            const listItems = document.querySelectorAll('.list-item');
-            addRightClickListener(listItems);
+                // Remove 'selected-list' class from other lists and add it to the new one
+                $('.list-item').removeClass('selected-list'); // Remove class from other list items
+                newList.classList.add('selected-list'); // Add class to the new list item
+
+                const noListsMessage = document.getElementById('no-lists-message');
+                noListsMessage.style.display = 'none'; // Hide the message
+                // Show the list title and box again
+                const listTitle = document.getElementById('list-title');
+                const box = document.querySelector('.box');
+                listTitle.style.display = 'block'; // Show the list title
+                box.style.display = 'block'; // Show the box
+
+                // Display tasks for the new list (empty initially)
+                displayTasksForList(currentUserId, newListRef.key);
+
+                // Add right-click listeners for all lists, including the new one
+                const listItems = document.querySelectorAll('.list-item');
+                addRightClickListener(listItems);
+            }).catch((error) => {
+                console.error('Error adding new list to Firebase:', error);
+                alert("There was an error adding your list. Please try again.");
+            });
         }).catch((error) => {
-            console.error('Error adding new list to Firebase:', error);
-            alert("There was an error adding your list. Please try again.");
+            console.error('Error fetching lists:', error);
+            alert("There was an error fetching the lists. Please try again.");
         });
     } else {
         alert("List name cannot be empty.");
@@ -448,43 +467,57 @@ function addNewTag() {
 
     if (tagName && tagName.trim() !== '') {
         const tagsRef = database.ref(`users/${currentUserId}/tags`);
-        
-        // Push a new tag to generate a unique key
-        const newTagRef = tagsRef.push(); // This generates a unique key for the new tag
-        const tagId = newTagRef.key; // Get the new unique key
-        
-        // Create the tag item using innerHTML
-        const tagItem = document.createElement('div');
-        tagItem.className = 'tag-item';
-        tagItem.setAttribute('data-tag-id', tagId); // Set the data-tag-id attribute
 
-        const tagColor = getRandomColor(); // Generate a random color
-        tagItem.innerHTML = `
-            <a href="#" class="tag-name">${tagName}</a>
-            <input type="color" class="color-picker" value="${tagColor}" />
-        `;
+        // First, fetch all tags to determine the max order value
+        tagsRef.once('value').then((snapshot) => {
+            let maxOrder = 0;
 
-        // Append the new tag item to the tags div
-        document.getElementById('tags').appendChild(tagItem);
+            // Iterate over existing tags to find the highest order value
+            snapshot.forEach((tagSnapshot) => {
+                const tag = tagSnapshot.val();
+                if (tag.order !== undefined && tag.order > maxOrder) {
+                    maxOrder = tag.order;
+                }
+            });
 
-        console.log(tagItem);
+            // Push a new tag to generate a unique key
+            const newTagRef = tagsRef.push(); // This generates a unique key for the new tag
+            const tagId = newTagRef.key; // Get the new unique key
+            
+            // Create the tag item using innerHTML
+            const tagItem = document.createElement('div');
+            tagItem.className = 'tag-item';
+            tagItem.setAttribute('data-tag-id', tagId); // Set the data-tag-id attribute
 
-        // Add event listener to the color picker
-        const colorPicker = tagItem.querySelector('.color-picker');
-        colorPicker.addEventListener('input', updateTagColor);
+            const tagColor = getRandomColor(); // Generate a random color
+            tagItem.innerHTML = `
+                <a href="#" class="tag-name">${tagName}</a>
+                <input type="color" class="color-picker" value="${tagColor}" />
+            `;
 
-        // Add right-click listener to all tags, including the new one
-        const tagItems = document.querySelectorAll('.tag-item');
-        addRightClickListener(tagItems);
+            // Append the new tag item to the tags div
+            document.getElementById('tag-items').appendChild(tagItem);
 
-        // Save the new tag to the database
-        newTagRef.set({
-            tagName: tagName,
-            tagColor: tagColor
-        }).then(() => {
-            console.log('New tag added to the database successfully.');
+            // Add event listener to the color picker
+            const colorPicker = tagItem.querySelector('.color-picker');
+            colorPicker.addEventListener('input', updateTagColor);
+
+            // Add right-click listener to all tags, including the new one
+            const tagItems = document.querySelectorAll('.tag-item');
+            addRightClickListener(tagItems);
+
+            // Save the new tag to the database with the order value
+            newTagRef.set({
+                tagName: tagName,
+                tagColor: tagColor,
+                order: maxOrder + 1 // Set the order as maxOrder + 1
+            }).then(() => {
+                console.log('New tag added to the database successfully.');
+            }).catch((error) => {
+                console.error('Error adding new tag to the database:', error);
+            });
         }).catch((error) => {
-            console.error('Error adding new tag to the database:', error);
+            console.error('Error fetching tags from the database:', error);
         });
         
     } else {
@@ -625,7 +658,7 @@ function addTagToTask(event, tagText) {
         });
     } else {
         // Get the corresponding color picker for the tag
-        const tagElements = document.querySelectorAll('#tags .tag-item');
+        const tagElements = document.querySelectorAll('#tag-items .tag-item');
         let color = '#000000'; // Default color
         let tagId = null; // Initialize tagId
 
@@ -898,7 +931,7 @@ function displayUserInfo(userData) {
 
 // Function to load user's lists
 function loadUserLists(userId) {
-    const listsRef = database.ref(`users/${userId}/lists`);
+    const listsRef = database.ref(`users/${userId}/lists`).orderByChild('order'); // Show lists in order
     listsRef.once('value').then((listsSnapshot) => {
         const listsContainer = document.getElementById('list-items');
         listsContainer.innerHTML = ''; // Clear previous lists
@@ -1001,7 +1034,7 @@ function addListClickEvent(userId) {
 // Initialize event listeners once when the document is ready
 $(document).ready(function() {
     // Event delegation for tag clicks
-    $('#tags').on('click', '.tag-name', function(event) {
+    $('#tag-items').on('click', '.tag-name', function(event) {
         event.preventDefault();
 
         const tagItem = $(this).closest('.tag-item');
@@ -1118,16 +1151,11 @@ function appendTaskItem(taskList, taskId, description, isDone, tagsAttached, tag
 
 // Function to load user's tags
 function loadUserTags(userId) {
-    const tagsRef = database.ref(`users/${userId}/tags`);
+    const tagsRef = database.ref(`users/${userId}/tags`).orderByChild('order'); // Show tags in order
 
     return tagsRef.once('value').then((tagsSnapshot) => { // Return the promise
-        const tagsContainer = document.getElementById('tags');
+        const tagsContainer = document.getElementById('tag-items');
         tagsContainer.innerHTML = ''; // Clear previous tags
-
-        // Add a heading for tags
-        const tagsHeader = document.createElement('h2');
-        tagsHeader.innerHTML = `Tags <img src="./img/add.png" class="add-tag" alt="Add"/>`;
-        tagsContainer.appendChild(tagsHeader);
 
         const tagsMap = {}; // Create a map to store tagId, tagName, and tagColor
 
@@ -1225,20 +1253,39 @@ function appendTagItem(tagsContainer, tagId, tagName, tagColor) {
 
 
 
-// Function to make tasks draggable to reorder them in the list!!
 document.addEventListener('DOMContentLoaded', function() {
+    // Make tasks draggable to reorder them in the list!!
     const taskList = document.getElementById('taskList');
-    
     // Initialize Sortable on the task list
-    const sortable = new Sortable(taskList, {
+    const sortableTask = new Sortable(taskList, {
         animation: 150, // Smooth animation
         ghostClass: 'dragging-background',
         onEnd: function(event) {
-            // You can update the task order in the database here
             updateTaskOrderInDatabase();
         }
     });
+
+    // Make lists draggable to reorder them in the sidebar
+    const listContainer = document.getElementById('list-items');
+    const sortableList = new Sortable.create(listContainer, {
+        animation: 150, // Animation speed in milliseconds
+        ghostClass: 'dragging-background',
+        onEnd: function (event) {
+            updateListOrderInDatabase();
+        }
+    });
+
+    // Make tags draggable to reorder them in the sidebar
+    const tagsContainer = document.getElementById('tag-items');
+    const sortableTags = new Sortable(tagsContainer, {
+        animation: 150, // Animation speed in milliseconds
+        ghostClass: 'dragging-background',
+        onEnd: function(event) {
+            updateTagOrderInDatabase();
+        },
+    });
 });
+
 
 // Update the task order in Firebase
 function updateTaskOrderInDatabase() {
@@ -1247,5 +1294,25 @@ function updateTaskOrderInDatabase() {
         const taskId = task.getAttribute('data-task-id');
         const taskRef = database.ref(`users/${currentUserId}/lists/${currentListId}/tasks/${taskId}`);
         taskRef.update({ order: index });
+    });
+}
+
+// Update the list order in Firebase
+function updateListOrderInDatabase() {
+    const lists = document.querySelectorAll('.list-item');
+    lists.forEach((list, index) => {
+        const listId = list.querySelector('.list-link').getAttribute('data-list-id');
+        const listRef = database.ref(`users/${currentUserId}/lists/${listId}`);
+        listRef.update({ order: index });
+    });
+}
+
+// Update the tag order in Firebase
+function updateTagOrderInDatabase() {
+    const tags = document.querySelectorAll('.tag-item');
+    tags.forEach((tag, index) => {
+        const tagId = tag.getAttribute('data-tag-id');
+        const tagRef = database.ref(`users/${currentUserId}/tags/${tagId}`);
+        tagRef.update({ order: index });
     });
 }
