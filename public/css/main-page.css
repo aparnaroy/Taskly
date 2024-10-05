@@ -610,7 +610,7 @@ body {
     border: none;
     width: 25px;
     height: 25px;
-    margin-right: 28.5px;
+    margin-right: 26px;
     border-radius: 20%;
 }
 
@@ -643,7 +643,7 @@ body {
     width: 16px;
     height: auto;
     cursor: pointer;
-    margin-left: 120px; /* Push it to the right */
+    margin-left: 122px; /* Push it to the right */
     display: inline-block; /* Ensure it behaves like a block for proper spacing */
     filter: invert(1);
     transition: all 0.25s ease; /* Smooth transition for hover effect */
