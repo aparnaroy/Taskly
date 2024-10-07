@@ -979,6 +979,8 @@ function loadUserLists(userId) {
             displayTasksForList(userId, listToDisplayId);
             const displayedList = listsSnapshot.child(listToDisplayId).val();
             document.getElementById('list-title').textContent = displayedList.listName; // Set the title
+
+            document.title = `Taskly | ${displayedList.listName}`; // Update the tab title
             
             // Set the selected class for the displayed list item
             const displayedListItem = listsContainer.querySelector(`.list-link[data-list-id="${listToDisplayId}"]`);
@@ -1027,6 +1029,8 @@ function addListClickEvent(userId) {
 
         const selectedListName = $(this).text(); // Get the list name from the clicked item
         document.getElementById('list-title').textContent = selectedListName; // Update the title
+
+        document.title = `Taskly | ${selectedListName}`; // Update the tab title
     });
 }
 
