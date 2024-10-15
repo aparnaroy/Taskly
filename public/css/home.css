@@ -260,3 +260,31 @@
     color: #111;
     font-weight: bold;
 }
+
+
+.scroll-arrow {
+    width: 40px; 
+    margin-top: 55px;
+    animation: bounce 1.5s ease-in-out infinite; /* Bouncing animation */
+}
+
+@keyframes bounce {
+    0% {
+        transform: translateY(0); /* Start at original position */
+    }
+    30% {
+        transform: translateY(-40px); /* First, move up */
+    }
+    60% {
+        transform: translateY(0); /* Return to original position */
+    }
+    75% {
+        transform: translateY(-25px); /* Quick, smaller second bounce */
+    }
+    95% {
+        transform: translateY(0); /* Return to original position faster */
+    }
+    100% {
+        transform: translateY(0); /* Ensure it ends at original position */
+    }
+}
